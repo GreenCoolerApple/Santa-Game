@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.haptics.Haptics
 
 class GameOverAnimation(private val game: SantaGame) {
     enum class Style { DROP, STAMP }
@@ -99,8 +100,14 @@ class GameOverAnimation(private val game: SantaGame) {
         touches.claim(pointer)
         val x = touches.x[pointer]
         val y = touches.y[pointer]
-        if (retryButton.contains(x, y)) return Action.RETRY
-        if (menuButton.contains(x, y)) return Action.MENU
+        if (retryButton.contains(x, y)) {
+            game.haptics.play(Haptics.Pattern.TAP)
+            return Action.RETRY
+        }
+        if (menuButton.contains(x, y)) {
+            game.haptics.play(Haptics.Pattern.TAP)
+            return Action.MENU
+        }
         return Action.NONE
     }
 

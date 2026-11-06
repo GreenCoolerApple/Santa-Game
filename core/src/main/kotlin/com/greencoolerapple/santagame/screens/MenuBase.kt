@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.ui.Button
 import com.greencoolerapple.santagame.world.Santa
 
@@ -30,6 +31,9 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
     protected open fun drawContentShapes(shapes: ShapeRenderer) {}
 
     protected open val showSanta: Boolean = true
+
+    protected open val toastY: Float
+        get() = 46f
 
     protected fun showToast(message: String) {
         toast = message
@@ -63,6 +67,7 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
             val y = game.touches.y[pointer]
             val hit = buttons.firstOrNull { it.contains(x, y) }
             if (hit != null) {
+                game.haptics.play(Haptics.Pattern.TAP)
                 onTap(hit)
                 if (game.screen !== this) return
             }
@@ -83,7 +88,7 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         drawTexts()
         for (button in buttons) button.drawLabel(game)
         if (toastTimer > 0f) {
-            game.drawText(toast, worldWidth / 2f, 46f, 1.8f, Palette.GOLD, alpha = minOf(1f, toastTimer * 2f))
+            game.drawText(toast, worldWidth / 2f, toastY, 1.8f, Palette.GOLD, alpha = minOf(1f, toastTimer * 2f))
         }
         game.batch.end()
     }

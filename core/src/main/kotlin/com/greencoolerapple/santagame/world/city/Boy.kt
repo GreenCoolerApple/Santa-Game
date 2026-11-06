@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.greencoolerapple.santagame.Palette
+import com.greencoolerapple.santagame.shop.Cosmetics
 
 class Boy {
     val position = Vector2()
@@ -45,7 +46,7 @@ class Boy {
         shapes.circle(x + fx * swing - fy * 14f, y + fy * swing + fx * 14f, 5f, 10)
         shapes.circle(x - fx * swing + fy * 14f, y - fy * swing - fx * 14f, 5f, 10)
 
-        shapes.color = Palette.BOY_JACKET
+        shapes.color = Cosmetics.jacket
         shapes.circle(x, y, RADIUS, 20)
         shapes.color = Palette.SANTA_RED
         shapes.rectLine(x - fy * 10f + fx * 4f, y + fx * 10f + fy * 4f, x + fy * 10f + fx * 4f, y - fx * 10f + fy * 4f, 5f)

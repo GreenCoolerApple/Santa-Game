@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.shop.ShopItem
+import com.greencoolerapple.santagame.shop.CoinRewards
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.ui.Draw
 import com.greencoolerapple.santagame.ui.GameOverAnimation
 import com.greencoolerapple.santagame.ui.Joystick
@@ -41,6 +44,9 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private var detection = 0f
     private var stateTimer = 0f
     private var time = 0f
+    private var playTime = 0f
+    private var coinsEarned = 0
+    private val detectionFactor = if (game.hasPerk(ShopItem.PERK_QUIET_BOOTS)) QUIET_BOOTS_FACTOR else 1f
     private var shakeTimer = 0f
     private var caughtBest = false
     private var bannerTimer = 0f
@@ -88,6 +94,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
     private fun restart() {
         level = 1
+        playTime = 0f
         totalGifts = 0
         housesRobbed = 0
         bannerTimer = 0f
@@ -120,7 +127,8 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                         style = GameOverAnimation.Style.STAMP,
                         stats = listOf(
                             GameOverAnimation.Stat(I18n.t("stolen.statGifts"), totalGifts),
-                            GameOverAnimation.Stat(I18n.t("stolen.statHouses"), housesRobbed)
+                            GameOverAnimation.Stat(I18n.t("stolen.statHouses"), housesRobbed),
+                            GameOverAnimation.Stat(I18n.t("coins.earned"), coinsEarned)
                         ),
                         newBest = caughtBest,
                         confetti = false,
@@ -134,7 +142,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 gameOver.update(delta)
                 if (before < gameOver.stampImpact && gameOver.time >= gameOver.stampImpact) {
                     shakeTimer = SHAKE_DURATION
-                    Gdx.input.vibrate(60)
+                    game.haptics.play(Haptics.Pattern.IMPACT)
                 }
                 when (gameOver.handleInput()) {
                     GameOverAnimation.Action.RETRY -> restart()
@@ -146,6 +154,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     }
 
     private fun updatePlaying(delta: Float) {
+        playTime += delta
         joystick.update(game.touches)
         input.set(joystick.direction)
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) input.x = -1f
@@ -164,7 +173,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 spotted = true
                 seenThisHouse = true
                 val closeness = 1f - minOf(1f, guard.position.dst(santa.position) / Guard.VIEW_RANGE)
-                detection += (1.3f + closeness * 2.4f) * delta
+                detection += (1.3f + closeness * 2.4f) * delta * detectionFactor
             }
         }
         if (!spotted) detection = maxOf(0f, detection - DETECTION_DECAY * delta)
@@ -174,9 +183,11 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             state = State.CAUGHT
             stateTimer = 0f
             shakeTimer = SHAKE_DURATION
-            Gdx.input.vibrate(200)
+            game.haptics.play(Haptics.Pattern.CAUGHT)
             joystick.release()
             stealTimer = 0f
+            coinsEarned = CoinRewards.stolenGifts(totalGifts, playTime)
+            game.earnCoins(coinsEarned)
             caughtBest = game.finishStolenRun(totalGifts)
             return
         }
@@ -188,7 +199,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 treeGifts--
                 carried++
                 sparkles.burst(house.tree.x, house.tree.y, Palette.GOLD, 12)
-                Gdx.input.vibrate(30)
+                game.haptics.play(Haptics.Pattern.COLLECT)
             }
         } else {
             stealTimer = 0f
@@ -196,6 +207,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
         if (carried > 0 && house.fireplace.contains(santa.position)) {
             lastGain = carried + if (treeGifts == 0) CLEAN_SWEEP_BONUS else 0
+            game.haptics.play(Haptics.Pattern.SUCCESS)
             totalGifts += lastGain
             housesRobbed++
             carried = 0
@@ -294,6 +306,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
     companion object {
         private const val SANTA_SPEED = 240f
+        private const val QUIET_BOOTS_FACTOR = 0.8f
         private const val MIN_SPEED_FACTOR = 0.68f
         private const val MAX_GUARD_SPEED = 150f
         private const val MAX_TREE_GIFTS = 8

@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.greencoolerapple.santagame.Palette
+import com.greencoolerapple.santagame.shop.Cosmetics
 
 class SneakySanta {
     val position = Vector2()
@@ -74,13 +75,13 @@ class SneakySanta {
 
         shapes.color = Palette.SNOW
         shapes.circle(x, y, RADIUS, 24)
-        shapes.color = Palette.SANTA_RED
+        shapes.color = Cosmetics.suit
         shapes.circle(x, y, RADIUS - 4f, 24)
 
         shapes.color = Palette.SNOW
         shapes.circle(x + fx * 7f, y + fy * 7f, 9f, 16)
         shapes.circle(x, y, 12f, 18)
-        shapes.color = Palette.SANTA_RED
+        shapes.color = Cosmetics.suit
         shapes.circle(x - fx * 1f, y - fy * 1f, 8.5f, 16)
         shapes.color = Palette.SNOW
         shapes.circle(x - fx * 8f, y - fy * 8f, 4.5f, 10)

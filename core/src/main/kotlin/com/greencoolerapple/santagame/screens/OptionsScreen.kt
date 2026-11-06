@@ -6,42 +6,51 @@ import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.ui.Button
 
 class OptionsScreen(game: SantaGame) : MenuBase(game) {
-    private val fpsDown = arrow("<")
-    private val fpsUp = arrow(">")
-    private val languageDown = arrow("<")
-    private val languageUp = arrow(">")
-    private val saveButton = Button("", labelScale = 2.3f)
-    private val loadButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = 2.3f)
+    private class Row(val labelKey: String, val value: () -> String, val change: (Int) -> Unit) {
+        val down = Button("<", fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 2.6f)
+        val up = Button(">", fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 2.6f)
+        var y = 0f
+    }
+
+    private val rows = listOf(
+        Row("options.fps", { game.settings.fpsLabel }, { game.changeFps(it) }),
+        Row("options.language", { game.settings.language.label }, { game.changeLanguage(it) }),
+        Row("options.haptics", { game.settings.hapticsLabel }, { game.toggleHaptics() }),
+        Row("options.hapticsIntensity", { game.settings.intensityLabel }, { game.changeHapticIntensity(it) })
+    )
+    private val saveButton = Button("", labelScale = 2.2f)
+    private val loadButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = 2.2f)
     private val back = backButton()
 
-    override val buttons = listOf(fpsDown, fpsUp, languageDown, languageUp, saveButton, loadButton, back)
+    override val buttons = rows.flatMap { listOf(it.down, it.up) } + listOf(saveButton, loadButton, back)
 
-    private val fpsY: Float
-        get() = worldHeight * 0.64f
-
-    private val languageY: Float
-        get() = worldHeight * 0.47f
-
-    private fun arrow(symbol: String) = Button(symbol, fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 3f)
+    override val showSanta: Boolean = false
 
     override fun layout() {
-        fpsDown.place(worldWidth / 2f - 250f, fpsY, 84f, 72f)
-        fpsUp.place(worldWidth / 2f + 250f, fpsY, 84f, 72f)
-        languageDown.place(worldWidth / 2f - 250f, languageY, 84f, 72f)
-        languageUp.place(worldWidth / 2f + 250f, languageY, 84f, 72f)
-        saveButton.place(worldWidth / 2f - 200f, worldHeight * 0.3f, 360f, 90f)
-        loadButton.place(worldWidth / 2f + 200f, worldHeight * 0.3f, 360f, 90f)
-        back.place(worldWidth / 2f, worldHeight * 0.13f, 260f, 72f)
+        for ((i, row) in rows.withIndex()) {
+            row.y = worldHeight * (0.74f - i * 0.12f)
+            row.down.place(worldWidth / 2f + 10f, row.y, 70f, 62f)
+            row.up.place(worldWidth / 2f + 430f, row.y, 70f, 62f)
+        }
+        saveButton.place(worldWidth / 2f - 200f, worldHeight * 0.23f, 360f, 82f)
+        loadButton.place(worldWidth / 2f + 200f, worldHeight * 0.23f, 360f, 82f)
+        back.place(worldWidth / 2f, worldHeight * 0.08f, 260f, 62f)
         saveButton.label = I18n.t("options.save")
         loadButton.label = I18n.t("options.load")
     }
 
     override fun onTap(button: Button) {
+        for (row in rows) {
+            if (button == row.down) {
+                row.change(-1)
+                return
+            }
+            if (button == row.up) {
+                row.change(1)
+                return
+            }
+        }
         when (button) {
-            fpsDown -> game.changeFps(-1)
-            fpsUp -> game.changeFps(1)
-            languageDown -> game.changeLanguage(-1)
-            languageUp -> game.changeLanguage(1)
             saveButton -> game.setScreen(SaveSlotsScreen(game, SaveSlotsScreen.Mode.SAVE))
             loadButton -> game.setScreen(SaveSlotsScreen(game, SaveSlotsScreen.Mode.LOAD))
             back -> onBack()
@@ -53,10 +62,10 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
     }
 
     override fun drawTexts() {
-        game.drawText(I18n.t("options.title"), worldWidth / 2f, worldHeight * 0.85f, 4.2f, Palette.GOLD)
-        game.drawText(I18n.t("options.fps"), worldWidth / 2f, fpsY + 50f, 1.5f, Palette.GOLD)
-        game.drawText(game.settings.fpsLabel, worldWidth / 2f, fpsY - 6f, 2.8f)
-        game.drawText(I18n.t("options.language"), worldWidth / 2f, languageY + 50f, 1.5f, Palette.GOLD)
-        game.drawText(game.settings.language.label, worldWidth / 2f, languageY - 6f, 2.4f)
+        game.drawText(I18n.t("options.title"), worldWidth / 2f, worldHeight * 0.9f, 4.2f, Palette.GOLD)
+        for (row in rows) {
+            game.drawText(I18n.t(row.labelKey), worldWidth / 2f - 440f, row.y + 14f, 1.9f, Palette.GOLD, centered = false)
+            game.drawText(row.value(), worldWidth / 2f + 220f, row.y, 2.2f)
+        }
     }
 }

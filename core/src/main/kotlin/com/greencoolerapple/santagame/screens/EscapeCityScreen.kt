@@ -10,7 +10,11 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.greencoolerapple.santagame.Palette
+import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.shop.ShopItem
+import com.greencoolerapple.santagame.shop.CoinRewards
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.ui.Draw
 import com.greencoolerapple.santagame.ui.GameOverAnimation
@@ -44,6 +48,8 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
     private var cities = 0
     private var stateTimer = 0f
     private var time = 0f
+    private var playTime = 0f
+    private var coinsEarned = 0
     private var shakeTimer = 0f
     private var bannerTimer = 0f
     private var caughtBest = false
@@ -84,6 +90,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
 
     private fun restart() {
         level = 1
+        playTime = 0f
         candyCount = 0
         cities = 0
         startCity()
@@ -111,7 +118,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
                 gameOver.update(delta)
                 if (before < gameOver.stampImpact && gameOver.time >= gameOver.stampImpact) {
                     shakeTimer = SHAKE_DURATION
-                    Gdx.input.vibrate(60)
+                    game.haptics.play(Haptics.Pattern.IMPACT)
                 }
                 when (gameOver.handleInput()) {
                     GameOverAnimation.Action.RETRY -> restart()
@@ -132,7 +139,9 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) input.x = 1f
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) input.y = -1f
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) input.y = 1f
-        boy.move(input, delta, BOY_SPEED, map)
+        playTime += delta
+        val speed = if (game.hasPerk(ShopItem.PERK_FAST_SNEAKERS)) BOY_SPEED * FAST_SNEAKERS_BONUS else BOY_SPEED
+        boy.move(input, delta, speed, map)
 
         val chaseSpeed = minOf(MAX_CHASE_SPEED, 196f + level * 8f)
         for (s in sick) {
@@ -149,6 +158,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
             if (candy.dst(boy.position) < CANDY_RADIUS) {
                 iterator.remove()
                 candyCount++
+                game.haptics.play(Haptics.Pattern.COLLECT)
                 game.awards.onCandy(candyCount)
                 sparkles.burst(candy.x, candy.y, Palette.GOLD, 10)
             }
@@ -159,13 +169,16 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
             stateTimer = 0f
             catchPosition.set(boy.position)
             joystick.release()
-            Gdx.input.vibrate(150)
+            game.haptics.play(Haptics.Pattern.CAUGHT)
+            coinsEarned = CoinRewards.escapeCity(score, playTime)
+            game.earnCoins(coinsEarned)
             caughtBest = game.finishEscapeGame(score, candyCount, cities)
             return
         }
 
         if (boy.position.dst(map.exit) < EXIT_RADIUS) {
             cities++
+            game.haptics.play(Haptics.Pattern.SUCCESS)
             game.awards.onCityEscaped(cities, !chasedThisCity)
             state = State.ESCAPED
             stateTimer = 0f
@@ -180,7 +193,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         if (before < DROP_TIME && stateTimer >= DROP_TIME) {
             shakeTimer = SHAKE_DURATION
             sparkles.burst(catchPosition.x, catchPosition.y, Palette.SNOW, 24)
-            Gdx.input.vibrate(80)
+            game.haptics.play(Haptics.Pattern.IMPACT)
         }
         if (before < BOW_TIME && stateTimer >= BOW_TIME) {
             sparkles.burst(catchPosition.x, catchPosition.y + 30f, Palette.GOLD, 18)
@@ -194,7 +207,8 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
                 stats = listOf(
                     GameOverAnimation.Stat(I18n.t("escape.statCandy"), candyCount),
                     GameOverAnimation.Stat(I18n.t("escape.statCities"), cities),
-                    GameOverAnimation.Stat(I18n.t("escape.statScore"), score)
+                    GameOverAnimation.Stat(I18n.t("escape.statScore"), score),
+                    GameOverAnimation.Stat(I18n.t("coins.earned"), coinsEarned)
                 ),
                 newBest = caughtBest,
                 confetti = false,
@@ -364,7 +378,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         }
         shapes.color = Palette.SNOW
         shapes.circle(x + boy.position.x * scale, y + boy.position.y * scale, 5f, 10)
-        shapes.color = Palette.BOY_JACKET
+        shapes.color = Cosmetics.jacket
         shapes.circle(x + boy.position.x * scale, y + boy.position.y * scale, 3.5f, 10)
     }
 
@@ -408,6 +422,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
 
     companion object {
         private const val BOY_SPEED = 270f
+        private const val FAST_SNEAKERS_BONUS = 1.08f
         private const val WANDER_SPEED = 85f
         private const val MAX_CHASE_SPEED = 250f
         private const val MAX_SICK = 16

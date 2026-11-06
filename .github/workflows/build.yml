@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  android:
-    name: Android
+  build:
+    name: Android + Desktop jar
     runs-on: ubuntu-latest
 
     steps:
@@ -28,10 +28,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build APK
+      - name: Build
         run: |
           chmod +x gradlew
-          ./gradlew :android:assembleDebug --parallel --build-cache
+          ./gradlew :android:assembleDebug :lwjgl3:dist --parallel --build-cache
           mv android/build/outputs/apk/debug/*.apk Santa-Android.apk
 
       - name: Upload APK
@@ -41,13 +41,26 @@ jobs:
           path: Santa-Android.apk
           if-no-files-found: error
 
+      - name: Upload desktop jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-jar
+          path: lwjgl3/build/dist/SantaGame.jar
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
   windows:
     name: Windows
+    needs: build
     runs-on: windows-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout icon
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: lwjgl3/icons
+          sparse-checkout-cone-mode: false
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -55,12 +68,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Build jar
-        shell: bash
-        run: ./gradlew :lwjgl3:dist --parallel --build-cache
+      - name: Download desktop jar
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-jar
+          path: dist
 
       - name: Package app
         shell: bash
@@ -70,9 +82,11 @@ jobs:
             --name SantaGame \
             --app-version 0.1.0 \
             --vendor GreenCoolerApple \
-            --input lwjgl3/build/dist \
+            --input dist \
             --main-jar SantaGame.jar \
             --icon lwjgl3/icons/icon.ico \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
             --java-options "-Dfile.encoding=UTF-8" \
             --dest package
 
@@ -82,3 +96,9 @@ jobs:
           name: Santa-Windows
           path: package/SantaGame
           if-no-files-found: error
+
+      - name: Remove temporary jar artifact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: desktop-jar
+          failOnError: false

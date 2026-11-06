@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.greencoolerapple.santagame.Palette
+import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.ui.Draw
 
 class Santa(var x: Float, private val baseY: Float) {
@@ -37,7 +38,7 @@ class Santa(var x: Float, private val baseY: Float) {
         shapes.rect(cx - 40f, baseY, 32f, 20f)
         shapes.rect(cx + 8f, baseY, 32f, 20f)
 
-        shapes.color = Palette.SANTA_RED
+        shapes.color = Cosmetics.suit
         shapes.rect(cx - 44f, y + 18f, 88f, 64f)
         shapes.circle(cx - 50f + tilt, y + 66f, 15f, 20)
         shapes.circle(cx + 50f + tilt, y + 66f, 15f, 20)
@@ -69,9 +70,9 @@ class Santa(var x: Float, private val baseY: Float) {
         shapes.circle(hx - 9f, y + 109f, 3.5f, 10)
         shapes.circle(hx + 9f, y + 109f, 3.5f, 10)
 
-        shapes.color = Palette.SANTA_RED
+        shapes.color = Cosmetics.suit
         shapes.triangle(hx - 26f, y + 120f, hx + 26f, y + 120f, hx + 30f - tilt * 2f, y + 166f)
-        shapes.color = Palette.SANTA_RED_DARK
+        shapes.color = Cosmetics.suitShade
         shapes.triangle(hx + 6f, y + 120f, hx + 26f, y + 120f, hx + 30f - tilt * 2f, y + 166f)
         shapes.color = Palette.SNOW
         shapes.rect(hx - 30f, y + 114f, 60f, 13f)

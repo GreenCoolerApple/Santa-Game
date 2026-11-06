@@ -75,8 +75,12 @@ object Palette {
 
     val BUTTON_GOLD: Color = Color.valueOf("b8860b")
     val BUTTON_GOLD_EDGE: Color = Color.valueOf("6e4f06")
+    val BUTTON_SHOP: Color = Color.valueOf("7b3fa0")
+    val BUTTON_SHOP_EDGE: Color = Color.valueOf("4a2263")
     val TOAST_BG: Color = Color.valueOf("1c2540")
+    val SILHOUETTE: Color = Color.valueOf("0a1226")
     val GOLD_LIGHT: Color = Color.valueOf("fff1b8")
+    val GOLD_DARK: Color = Color.valueOf("9c7412")
     val LOCK: Color = Color.valueOf("6b7590")
     val LOCK_BG: Color = Color.valueOf("1a2135")
     val CARD: Color = Color.valueOf("15203a")

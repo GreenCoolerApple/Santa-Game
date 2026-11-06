@@ -14,12 +14,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.greencoolerapple.santagame.awards.Award
 import com.greencoolerapple.santagame.awards.AwardTracker
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.save.GameData
 import com.greencoolerapple.santagame.save.SaveSystem
 import com.greencoolerapple.santagame.save.Settings
-import com.greencoolerapple.santagame.screens.MainMenuScreen
+import com.greencoolerapple.santagame.screens.IntroScreen
+import com.greencoolerapple.santagame.shop.Cosmetics
+import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.world.Scenery
 
 class SantaGame : Game() {
@@ -37,6 +40,7 @@ class SantaGame : Game() {
     val touches = Touches()
     val saves = SaveSystem()
     val awards = AwardTracker(this)
+    val haptics = Haptics { settings }
 
     var data = GameData()
         private set
@@ -59,13 +63,15 @@ class SantaGame : Game() {
         settings = saves.loadSettings() ?: Settings()
         limiter.fps = settings.fps
         I18n.language = settings.language
+        applyCosmetics()
         awards.checkExplorer()
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
-        setScreen(MainMenuScreen(this))
+        setScreen(IntroScreen(this))
     }
 
     override fun render() {
         super.render()
+        haptics.update(Gdx.graphics.deltaTime)
         drawAwardPopup()
         limiter.sync()
     }
@@ -122,8 +128,66 @@ class SantaGame : Game() {
         val earned = data.awards
         data.copyFrom(loaded)
         data.awards = data.awards or earned
+        applyCosmetics()
         persist()
         return true
+    }
+
+    fun toggleHaptics() {
+        settings.haptics = !settings.haptics
+        saves.saveSettings(settings)
+        haptics.play(Haptics.Pattern.PREVIEW)
+    }
+
+    fun changeHapticIntensity(step: Int) {
+        settings.cycleIntensity(step)
+        saves.saveSettings(settings)
+        haptics.play(Haptics.Pattern.PREVIEW)
+    }
+
+    fun earnCoins(amount: Int) {
+        if (amount <= 0) return
+        data.coins += amount
+        data.coinsEarned += amount
+        persist()
+    }
+
+    fun owns(item: ShopItem): Boolean = item.free || (data.owned and item.bit) != 0L
+
+    fun hasPerk(item: ShopItem): Boolean = item.category == ShopItem.Category.PERK && owns(item)
+
+    fun isEquipped(item: ShopItem): Boolean = when (item.category) {
+        ShopItem.Category.SUIT -> equippedSuit() == item
+        ShopItem.Category.JACKET -> equippedJacket() == item
+        ShopItem.Category.PERK -> owns(item)
+    }
+
+    fun buy(item: ShopItem): Boolean {
+        if (owns(item) || data.coins < item.price) return false
+        data.coins -= item.price
+        data.owned = data.owned or item.bit
+        if (item.category != ShopItem.Category.PERK) equip(item) else persist()
+        awards.unlock(Award.SHOPPER)
+        return true
+    }
+
+    fun equip(item: ShopItem) {
+        if (!owns(item)) return
+        when (item.category) {
+            ShopItem.Category.SUIT -> data.suit = item.indexInCategory
+            ShopItem.Category.JACKET -> data.jacket = item.indexInCategory
+            ShopItem.Category.PERK -> return
+        }
+        applyCosmetics()
+        persist()
+    }
+
+    private fun equippedSuit(): ShopItem = ShopItem.suits.getOrNull(data.suit)?.takeIf { owns(it) } ?: ShopItem.SUIT_CLASSIC
+
+    private fun equippedJacket(): ShopItem = ShopItem.jackets.getOrNull(data.jacket)?.takeIf { owns(it) } ?: ShopItem.JACKET_BLUE
+
+    private fun applyCosmetics() {
+        Cosmetics.apply(equippedSuit(), equippedJacket())
     }
 
     fun bestScore(mode: GameMode): Int = when (mode) {

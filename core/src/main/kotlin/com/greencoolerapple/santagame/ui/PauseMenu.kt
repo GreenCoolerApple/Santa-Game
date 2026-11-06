@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Rectangle
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.haptics.Haptics
 
 class PauseMenu(private val game: SantaGame) {
     enum class Action { NONE, MENU }
@@ -45,10 +46,17 @@ class PauseMenu(private val game: SantaGame) {
 
         if (paused) {
             touches.claim(pointer)
-            if (resumeButton.contains(x, y)) paused = false
-            if (menuButton.contains(x, y)) return Action.MENU
+            if (resumeButton.contains(x, y)) {
+                game.haptics.play(Haptics.Pattern.TAP)
+                paused = false
+            }
+            if (menuButton.contains(x, y)) {
+                game.haptics.play(Haptics.Pattern.TAP)
+                return Action.MENU
+            }
         } else if (canPause && hitArea.contains(x, y)) {
             touches.claim(pointer)
+            game.haptics.play(Haptics.Pattern.TAP)
             paused = true
         }
         return Action.NONE

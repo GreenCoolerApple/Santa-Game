@@ -2,6 +2,7 @@ package com.greencoolerapple.santagame.ui
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.greencoolerapple.santagame.Palette
 
 object Draw {
     fun roundedRect(shapes: ShapeRenderer, x: Float, y: Float, width: Float, height: Float, radius: Float) {
@@ -27,6 +28,25 @@ object Draw {
             shapes.triangle(cx + c0 * inner, cy + s0 * inner, cx + c0 * outer, cy + s0 * outer, cx + c1 * outer, cy + s1 * outer)
             shapes.triangle(cx + c0 * inner, cy + s0 * inner, cx + c1 * outer, cy + s1 * outer, cx + c1 * inner, cy + s1 * inner)
         }
+    }
+
+    fun goldenGift(shapes: ShapeRenderer, cx: Float, cy: Float, size: Float) {
+        val half = size / 2f
+        shapes.color = Palette.GOLD_DARK
+        shapes.rect(cx - half, cy - half - size * 0.06f, size, size * 0.8f)
+        shapes.color = Palette.GOLD
+        shapes.rect(cx - half, cy - half, size, size * 0.74f)
+        shapes.rect(cx - half - size * 0.06f, cy + size * 0.12f, size * 1.12f, size * 0.22f)
+        shapes.color = Palette.GOLD_LIGHT
+        shapes.rect(cx - size * 0.09f, cy - half, size * 0.18f, size * 0.96f)
+        shapes.circle(cx - size * 0.2f, cy + half + size * 0.04f, size * 0.17f, 12)
+        shapes.circle(cx + size * 0.2f, cy + half + size * 0.04f, size * 0.17f, 12)
+    }
+
+    fun heart(shapes: ShapeRenderer, cx: Float, cy: Float, size: Float) {
+        shapes.circle(cx - size * 0.25f, cy, size * 0.28f, 16)
+        shapes.circle(cx + size * 0.25f, cy, size * 0.28f, 16)
+        shapes.triangle(cx - size * 0.52f, cy - size * 0.08f, cx + size * 0.52f, cy - size * 0.08f, cx, cy - size * 0.62f)
     }
 
     fun star(shapes: ShapeRenderer, cx: Float, cy: Float, outer: Float, rotation: Float) {

@@ -3,6 +3,7 @@ package com.greencoolerapple.santagame.awards
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.ui.Draw
 
@@ -21,6 +22,7 @@ class AwardTracker(private val game: SantaGame) {
         game.data.awards = game.data.awards or award.bit
         game.persist()
         pending.addLast(award)
+        game.haptics.play(Haptics.Pattern.AWARD)
     }
 
     fun onCatchProgress(score: Int, seconds: Float) {

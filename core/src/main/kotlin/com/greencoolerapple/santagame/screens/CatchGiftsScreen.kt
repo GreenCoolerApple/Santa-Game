@@ -8,6 +8,9 @@ import com.badlogic.gdx.math.MathUtils
 import com.greencoolerapple.santagame.GameMode
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.shop.ShopItem
+import com.greencoolerapple.santagame.shop.CoinRewards
+import com.greencoolerapple.santagame.haptics.Haptics
 import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.ui.GameOverAnimation
 import com.greencoolerapple.santagame.world.FallingItem
@@ -24,7 +27,8 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
     private var state = State.PLAYING
     private var score = 0
-    private var lives = MAX_LIVES
+    private val maxLives = if (game.hasPerk(ShopItem.PERK_EXTRA_LIFE)) BASE_LIVES + 1 else BASE_LIVES
+    private var lives = maxLives
     private var elapsed = 0f
     private var spawnTimer = 0.6f
     private var shakeTimer = 0f
@@ -111,6 +115,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         when (item.type) {
             FallingItem.Type.GIFT -> {
                 score++
+                game.haptics.play(Haptics.Pattern.TAP)
                 sparkles.burst(item.x, item.y, Palette.GOLD)
             }
             FallingItem.Type.COAL -> {
@@ -133,9 +138,11 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private fun loseLife() {
         lives--
         shakeTimer = SHAKE_DURATION
-        Gdx.input.vibrate(80)
+        game.haptics.play(if (lives <= 0) Haptics.Pattern.CAUGHT else Haptics.Pattern.HIT)
         if (lives <= 0) {
             state = State.GAME_OVER
+            val coins = CoinRewards.catchGifts(score, elapsed)
+            game.earnCoins(coins)
             val newBest = game.finishCatchGame(score)
             gameOver.start(
                 title = I18n.t("catch.gameOver"),
@@ -143,7 +150,8 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 style = GameOverAnimation.Style.DROP,
                 stats = listOf(
                     GameOverAnimation.Stat(I18n.t("catch.statGifts"), score),
-                    GameOverAnimation.Stat(I18n.t("catch.statTime"), elapsed.toInt())
+                    GameOverAnimation.Stat(I18n.t("catch.statTime"), elapsed.toInt()),
+                    GameOverAnimation.Stat(I18n.t("coins.earned"), coins)
                 ),
                 newBest = newBest,
                 confetti = true,
@@ -157,7 +165,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         items.clear()
         sparkles.clear()
         score = 0
-        lives = MAX_LIVES
+        lives = maxLives
         elapsed = 0f
         spawnTimer = 0.6f
         state = State.PLAYING
@@ -188,7 +196,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         val gap = 14f
         val top = worldHeight - 56f
         val right = pauseMenu.pauseButton.x - 36f
-        for (i in 0 until MAX_LIVES) {
+        for (i in 0 until maxLives) {
             val cx = right - i * (size + gap)
             shapes.color = if (i < lives) Palette.HEART else Palette.HEART_EMPTY
             shapes.circle(cx - size * 0.25f, top, size * 0.28f, 16)
@@ -198,7 +206,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
     }
 
     companion object {
-        private const val MAX_LIVES = 3
+        private const val BASE_LIVES = 3
         private const val START_SPAWN_INTERVAL = 1.1f
         private const val MIN_SPAWN_INTERVAL = 0.35f
         private const val MAX_COAL_CHANCE = 0.4f

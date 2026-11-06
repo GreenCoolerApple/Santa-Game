@@ -20,7 +20,8 @@ enum class Award(private val key: String) {
     SUGAR_RUSH("sugarRush"),
     EXPLORER("explorer"),
     SAFE_KEEPING("safeKeeping"),
-    POLYGLOT("polyglot");
+    POLYGLOT("polyglot"),
+    SHOPPER("shopper");
 
     val bit: Long
         get() = 1L shl ordinal
