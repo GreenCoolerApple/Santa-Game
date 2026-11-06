@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.ui
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
@@ -131,6 +132,8 @@ class GameOverAnimation(private val game: SantaGame) {
             }
         }
 
+        retryButton.label = I18n.t("over.retry")
+        menuButton.label = I18n.t("over.menu")
         val pop = buttonPop()
         if (pop > 0f) {
             val y = height * 0.15f
@@ -164,7 +167,7 @@ class GameOverAnimation(private val game: SantaGame) {
         if (newBest && time > bestAt) {
             val t = time - bestAt
             val scale = 2.6f * easeOutBack(minOf(1f, t * 2.5f)) + MathUtils.sin(t * 6f) * 0.12f
-            game.drawText("NEW BEST!", width / 2f, bestY(height), scale, Palette.GOLD)
+            game.drawText(I18n.t("over.newBest"), width / 2f, bestY(height), scale, Palette.GOLD)
         }
 
         val pop = buttonPop()

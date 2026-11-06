@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.save
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import java.io.ByteArrayInputStream
@@ -14,12 +15,19 @@ class SaveSystem {
     class SlotInfo(val state: SlotState, val data: GameData?)
 
     val autosaveFile: FileHandle
-        get() = Gdx.files.local("$FOLDER/autosave.sav")
+        get() = file("autosave.sav")
 
     val settingsFile: FileHandle
-        get() = Gdx.files.local("$FOLDER/settings.sav")
+        get() = file("settings.sav")
 
-    fun slotFile(index: Int): FileHandle = Gdx.files.local("$FOLDER/slot${index + 1}.sav")
+    fun slotFile(index: Int): FileHandle = file("slot${index + 1}.sav")
+
+    private fun file(name: String): FileHandle =
+        if (Gdx.app.type == Application.ApplicationType.Desktop) {
+            Gdx.files.external("$DESKTOP_FOLDER/$FOLDER/$name")
+        } else {
+            Gdx.files.local("$FOLDER/$name")
+        }
 
     fun saveData(file: FileHandle, data: GameData): Boolean = write(file, KIND_DATA, data.encode())
 
@@ -81,6 +89,7 @@ class SaveSystem {
     companion object {
         const val SLOT_COUNT = 3
         private const val FOLDER = "saves"
+        private const val DESKTOP_FOLDER = ".santa-game"
         private const val MAGIC = 0x53475356
         private const val VERSION = 1
         private const val KIND_DATA = 1

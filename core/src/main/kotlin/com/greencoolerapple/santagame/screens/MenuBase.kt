@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.screens
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -31,7 +32,10 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         toastTimer = TOAST_TIME
     }
 
-    protected fun backButton(): Button = Button("Back", fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 2f)
+    private val backButtons = mutableListOf<Button>()
+
+    protected fun backButton(): Button =
+        Button(I18n.t("back"), fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 2f).also { backButtons += it }
 
     override fun render(delta: Float) {
         time += delta
@@ -40,6 +44,7 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         game.touches.update(game.viewport)
         santa.x = worldWidth * 0.12f
         santa.idle(delta)
+        for (button in backButtons) button.label = I18n.t("back")
         layout()
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

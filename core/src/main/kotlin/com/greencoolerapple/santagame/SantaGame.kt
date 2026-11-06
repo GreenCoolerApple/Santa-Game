@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.save.GameData
 import com.greencoolerapple.santagame.save.SaveSystem
@@ -45,7 +46,7 @@ class SantaGame : Game() {
     override fun create() {
         batch = SpriteBatch()
         shapes = ShapeRenderer()
-        font = BitmapFont().apply {
+        font = BitmapFont(Gdx.files.internal(FONT_FILE)).apply {
             region.texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
             setUseIntegerPositions(false)
         }
@@ -53,6 +54,7 @@ class SantaGame : Game() {
         data = saves.loadData(saves.autosaveFile) ?: importLegacyScores()
         settings = saves.loadSettings() ?: Settings()
         limiter.fps = settings.fps
+        I18n.language = settings.language
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         setScreen(MainMenuScreen(this))
     }
@@ -66,8 +68,8 @@ class SantaGame : Game() {
         val imported = GameData()
         runCatching {
             val prefs = Gdx.app.getPreferences(LEGACY_PREFS)
-            imported.bestCatch = prefs.getInteger(GameMode.CATCH_GIFTS.prefsKey, 0)
-            imported.bestStolen = prefs.getInteger(GameMode.STOLEN_GIFTS.prefsKey, 0)
+            imported.bestCatch = prefs.getInteger("best", 0)
+            imported.bestStolen = prefs.getInteger("best_stolen", 0)
         }
         saves.saveData(saves.autosaveFile, imported)
         return imported
@@ -78,6 +80,12 @@ class SantaGame : Game() {
     fun changeFps(step: Int) {
         settings.cycleFps(step)
         limiter.fps = settings.fps
+        saves.saveSettings(settings)
+    }
+
+    fun changeLanguage(step: Int) {
+        settings.cycleLanguage(step)
+        I18n.language = settings.language
         saves.saveSettings(settings)
     }
 
@@ -98,6 +106,17 @@ class SantaGame : Game() {
     fun bestScore(mode: GameMode): Int = when (mode) {
         GameMode.CATCH_GIFTS -> data.bestCatch
         GameMode.STOLEN_GIFTS -> data.bestStolen
+        GameMode.ESCAPE_CITY -> data.bestEscape
+    }
+
+    fun finishEscapeGame(score: Int, candies: Int, cities: Int): Boolean {
+        data.escapeGames++
+        data.candiesEaten += candies
+        data.citiesEscaped += cities
+        val best = score > data.bestEscape
+        if (best) data.bestEscape = score
+        persist()
+        return best
     }
 
     fun finishCatchGame(score: Int): Boolean {
@@ -127,7 +146,7 @@ class SantaGame : Game() {
     }
 
     fun textWidth(text: String, scale: Float): Float {
-        font.data.setScale(scale)
+        font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
         return layout.width
     }
@@ -142,7 +161,7 @@ class SantaGame : Game() {
         alpha: Float = 1f
     ) {
         if (alpha <= 0f) return
-        font.data.setScale(scale)
+        font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
         val drawX = if (centered) x - layout.width / 2f else x
         val drawY = if (centered) y + layout.height / 2f else y
@@ -168,5 +187,7 @@ class SantaGame : Game() {
         const val WORLD_HEIGHT = 720f
         const val GROUND_HEIGHT = 90f
         private const val LEGACY_PREFS = "santa-game"
+        private const val FONT_FILE = "fonts/santa.fnt"
+        private const val FONT_RATIO = 0.42f
     }
 }

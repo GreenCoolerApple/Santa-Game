@@ -56,6 +56,23 @@ object Palette {
     val METER_SAFE: Color = Color.valueOf("4caf50")
     val METER_DANGER: Color = Color.valueOf("ff3b30")
 
+    val CITY_STREET: Color = Color.valueOf("2b3342")
+    val CITY_MARKING: Color = Color.valueOf("8a8460")
+    val CITY_SIDEWALK: Color = Color.valueOf("9aa6ba")
+    val LAMP_GLOW: Color = Color(1f, 0.85f, 0.45f, 0.12f)
+    val MINIMAP_BG: Color = Color(0f, 0f, 0f, 0.55f)
+    val MINIMAP_BLOCK: Color = Color(0.55f, 0.6f, 0.72f, 0.75f)
+    val MINIMAP_PARK: Color = Color(0.85f, 0.9f, 1f, 0.6f)
+    val SICK_SKIN: Color = Color.valueOf("7fcf55")
+    val SICK_CLOTHES: Color = Color.valueOf("3e5a3c")
+    val SICK_PATCH: Color = Color.valueOf("2c402a")
+    val SICK_HAIR: Color = Color.valueOf("2e3a24")
+    val SICK_EYES: Color = Color.valueOf("f2f26a")
+    val BOY_JACKET: Color = Color.valueOf("3a7bd5")
+    val EXIT_GLOW: Color = Color(0.5f, 1f, 0.6f, 0.22f)
+    val EXIT_RING: Color = Color.valueOf("7dff9a")
+    val CANDY_STRIPE: Color = Color.valueOf("ffffff")
+
     val FURNITURE: List<Color> = listOf(
         Color.valueOf("6d2e46"),
         Color.valueOf("5b3a24"),

@@ -40,3 +40,45 @@ jobs:
           name: Santa-Android
           path: Santa-Android.apk
           if-no-files-found: error
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build jar
+        shell: bash
+        run: ./gradlew :lwjgl3:dist --parallel --build-cache
+
+      - name: Package app
+        shell: bash
+        run: |
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version 0.1.0 \
+            --vendor GreenCoolerApple \
+            --input lwjgl3/build/dist \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.ico \
+            --java-options "-Dfile.encoding=UTF-8" \
+            --dest package
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-Windows
+          path: package/SantaGame
+          if-no-files-found: error

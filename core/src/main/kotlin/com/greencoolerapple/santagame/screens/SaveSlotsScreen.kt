@@ -2,6 +2,7 @@ package com.greencoolerapple.santagame.screens
 
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.save.SaveSystem
 import com.greencoolerapple.santagame.ui.Button
 import java.text.SimpleDateFormat
@@ -9,11 +10,11 @@ import java.util.Date
 import java.util.Locale
 
 class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) {
-    enum class Mode(val title: String) { SAVE("SAVE GAME"), LOAD("LOAD GAME") }
+    enum class Mode(val titleKey: String) { SAVE("slots.save"), LOAD("slots.load") }
 
-    private val slots = List(SaveSystem.SLOT_COUNT) { i ->
+    private val slots = List(SaveSystem.SLOT_COUNT) {
         Button(
-            "Slot ${i + 1}",
+            "",
             fill = if (mode == Mode.SAVE) Palette.BUTTON else Palette.BUTTON_ALT,
             edge = if (mode == Mode.SAVE) Palette.BUTTON_EDGE else Palette.BUTTON_ALT_EDGE,
             labelScale = 2.2f
@@ -29,21 +30,22 @@ class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) 
         refresh()
     }
 
+    private fun slotName(index: Int): String = I18n.t("slot", index + 1)
+
     private fun refresh() {
         for (i in slots.indices) {
             val info = game.saves.slotInfo(i)
             states[i] = info.state
             val data = info.data
             slots[i].sublabel = when (info.state) {
-                SaveSystem.SlotState.EMPTY -> "Empty"
-                SaveSystem.SlotState.DAMAGED -> "Damaged save"
-                SaveSystem.SlotState.OK -> buildString {
-                    if (data != null) {
-                        append(dateFormat.format(Date(data.savedAt)))
-                        append("   Catch ").append(data.bestCatch)
-                        append("   Stolen ").append(data.bestStolen)
-                        if (data.hasRun) append("   House ").append(data.runHouse)
-                    }
+                SaveSystem.SlotState.EMPTY -> I18n.t("slot.empty")
+                SaveSystem.SlotState.DAMAGED -> I18n.t("slot.damaged")
+                SaveSystem.SlotState.OK -> if (data == null) "" else buildString {
+                    append(dateFormat.format(Date(data.savedAt)))
+                    append("   ").append(I18n.t("slot.catch", data.bestCatch))
+                    append("   ").append(I18n.t("slot.stolen", data.bestStolen))
+                    append("   ").append(I18n.t("slot.escape", data.bestEscape))
+                    if (data.hasRun) append("   ").append(I18n.t("slot.house", data.runHouse))
                 }
             }
         }
@@ -51,7 +53,8 @@ class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) 
 
     override fun layout() {
         for (i in slots.indices) {
-            slots[i].place(worldWidth / 2f + 60f, worldHeight * (0.64f - i * 0.15f), 720f, 92f)
+            slots[i].label = slotName(i)
+            slots[i].place(worldWidth / 2f + 60f, worldHeight * (0.64f - i * 0.15f), 780f, 92f)
         }
         back.place(worldWidth / 2f + 60f, worldHeight * 0.14f, 260f, 70f)
     }
@@ -63,14 +66,14 @@ class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) 
         }
         val index = slots.indexOf(button)
         if (index < 0) return
-        val name = "Slot ${index + 1}"
+        val name = slotName(index)
         when (mode) {
-            Mode.SAVE -> showToast(if (game.saveToSlot(index)) "Game saved to $name" else "Could not save to $name")
+            Mode.SAVE -> showToast(I18n.t(if (game.saveToSlot(index)) "toast.saved" else "toast.saveFailed", name))
             Mode.LOAD -> showToast(
                 when (states[index]) {
-                    SaveSystem.SlotState.EMPTY -> "$name is empty"
-                    SaveSystem.SlotState.DAMAGED -> "$name is damaged"
-                    SaveSystem.SlotState.OK -> if (game.loadFromSlot(index)) "$name loaded" else "Could not load $name"
+                    SaveSystem.SlotState.EMPTY -> I18n.t("toast.empty", name)
+                    SaveSystem.SlotState.DAMAGED -> I18n.t("toast.damaged", name)
+                    SaveSystem.SlotState.OK -> I18n.t(if (game.loadFromSlot(index)) "toast.loaded" else "toast.loadFailed", name)
                 }
             )
         }
@@ -82,6 +85,6 @@ class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) 
     }
 
     override fun drawTexts() {
-        game.drawText(mode.title, worldWidth / 2f + 60f, worldHeight * 0.85f, 4f, Palette.GOLD)
+        game.drawText(I18n.t(mode.titleKey), worldWidth / 2f + 60f, worldHeight * 0.85f, 4f, Palette.GOLD)
     }
 }

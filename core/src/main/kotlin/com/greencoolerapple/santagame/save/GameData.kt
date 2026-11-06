@@ -15,6 +15,10 @@ class GameData {
     var runGifts = 0
     var runHouses = 0
     var savedAt = 0L
+    var bestEscape = 0
+    var candiesEaten = 0
+    var escapeGames = 0
+    var citiesEscaped = 0
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -30,6 +34,10 @@ class GameData {
         runGifts = other.runGifts
         runHouses = other.runHouses
         savedAt = other.savedAt
+        bestEscape = other.bestEscape
+        candiesEaten = other.candiesEaten
+        escapeGames = other.escapeGames
+        citiesEscaped = other.citiesEscaped
     }
 
     fun clearRun() {
@@ -51,6 +59,10 @@ class GameData {
             out.writeInt(runGifts)
             out.writeInt(runHouses)
             out.writeLong(savedAt)
+            out.writeInt(bestEscape)
+            out.writeInt(candiesEaten)
+            out.writeInt(escapeGames)
+            out.writeInt(citiesEscaped)
         }
         return bytes.toByteArray()
     }
@@ -67,6 +79,12 @@ class GameData {
             runGifts = input.readInt().coerceAtLeast(0)
             runHouses = input.readInt().coerceAtLeast(0)
             savedAt = input.readLong()
+            if (input.available() >= 16) {
+                bestEscape = input.readInt().coerceAtLeast(0)
+                candiesEaten = input.readInt().coerceAtLeast(0)
+                escapeGames = input.readInt().coerceAtLeast(0)
+                citiesEscaped = input.readInt().coerceAtLeast(0)
+            }
         }
     }
 }

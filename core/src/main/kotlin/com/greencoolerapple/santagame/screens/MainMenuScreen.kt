@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.screens
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
@@ -12,6 +13,8 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
     override val buttons = listOf(gameModeButton, optionsButton)
 
     override fun layout() {
+        gameModeButton.label = I18n.t("menu.gameMode")
+        optionsButton.label = I18n.t("menu.options")
         gameModeButton.place(worldWidth / 2f, worldHeight * 0.55f, 460f, 100f)
         optionsButton.place(worldWidth / 2f, worldHeight * 0.36f, 460f, 100f)
     }

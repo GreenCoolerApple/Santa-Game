@@ -4,7 +4,7 @@
 
 # Santa Game
 
-A Christmas game made with Kotlin and libGDX.
+A Christmas game made with Kotlin and libGDX, for Android and Windows, in English and Portuguese (Brazil).
 
 ## Game modes
 
@@ -24,10 +24,19 @@ Sneak into people's houses through the fireplace, steal the gifts under the Chri
 
 Your Stolen Gifts run is saved after every house you rob, so you can leave and continue from the same house later.
 
+### Escape from the Santa City
+
+You are a boy lost in a snowy city at night, and the green sick people are looking for you to wrap you up in a Christmas present. Find the glowing exit on the other side of the city without getting caught. The sick wander the streets, and when one of them sees you it chases you through the streets and then searches the last place it saw you. Buildings and park trees block their view. Grab candy on the way for extra points, and use the minimap and the arrow on the edge of the screen to find the exit. Every city is bigger, with more and faster sick people.
+
+- Touch anywhere and drag to use the virtual joystick
+- WASD or arrow keys on a keyboard
+
 ## Menus
 
-- **Game Mode** — pick Catch Gifts or Stolen Gifts
-- **Options** — FPS limit (30, 60, 90, 120 or Max), Save Game and Load Game
+- **Game Mode** — pick Catch Gifts, Stolen Gifts or Escape from the Santa City
+- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), Save Game and Load Game
+
+The language starts as the system language and can be changed at any time.
 
 ## Save system
 
@@ -35,26 +44,36 @@ The game uses its own binary save format instead of platform preferences. Every 
 
 - `saves/autosave.sav` — best scores, stats and the current Stolen Gifts run, updated automatically
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
-- `saves/settings.sav` — options such as the FPS limit, kept separate so loading a slot never changes them
+- `saves/settings.sav` — options such as the FPS limit and language, kept separate so loading a slot never changes them
+
+On Android the saves live in the app's private storage. On Windows they live in `.santa-game/saves` inside your user folder.
 
 ## Pause
 
-Both modes have a pause button in the top right corner. The Android back button also pauses, and the game pauses itself when the app goes to the background.
+Every mode has a pause button in the top right corner. The Android back button also pauses, and the game pauses itself when the app goes to the background.
 
 ## Project structure
 
-- `core` — the game itself (screens, Santa, falling items, scenery, houses and guards)
+- `core` — the game itself (screens, modes, save system, translations)
 - `android` — Android launcher, manifest and icons
-- `assets` — game assets shared by every platform
+- `lwjgl3` — Windows (desktop) launcher and packaging
+- `assets` — game assets shared by every platform, including the bitmap font
+
+The font is generated from Inter Bold, licensed under the SIL Open Font License 1.1 (see `assets/fonts/Inter-LICENSE.txt`).
 
 ## Building
 
-Requires JDK 17 and the Android SDK.
+Requires JDK 17, plus the Android SDK for the Android build.
 
 ```bash
 ./gradlew :android:assembleDebug
+./gradlew :lwjgl3:run
+./gradlew :lwjgl3:dist
 ```
 
-The APK is written to `android/build/outputs/apk/debug/`.
+The APK is written to `android/build/outputs/apk/debug/`, and `dist` writes a runnable `SantaGame.jar` to `lwjgl3/build/dist/`.
 
-GitHub Actions builds `Santa-Android.apk` on every push to `main`.
+GitHub Actions builds two artifacts on every push to `main`:
+
+- `Santa-Android` — the Android APK
+- `Santa-Windows` — a ready-to-run Windows folder with `SantaGame.exe` and a bundled Java runtime

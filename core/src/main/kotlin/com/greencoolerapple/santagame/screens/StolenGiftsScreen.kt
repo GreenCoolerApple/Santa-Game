@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.screens
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
@@ -54,7 +55,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             level = data.runHouse
             totalGifts = data.runGifts
             housesRobbed = data.runHouses
-            bannerText = "Continuing from House $level"
+            bannerText = I18n.t("stolen.continue", level)
             bannerTimer = BANNER_TIME
         }
         startHouse()
@@ -112,12 +113,12 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                     state = State.GAME_OVER
                     stateTimer = 0f
                     gameOver.start(
-                        title = "CAUGHT!",
+                        title = I18n.t("stolen.caught"),
                         color = Palette.METER_DANGER,
                         style = GameOverAnimation.Style.STAMP,
                         stats = listOf(
-                            GameOverAnimation.Stat("Gifts stolen", totalGifts),
-                            GameOverAnimation.Stat("Houses robbed", housesRobbed)
+                            GameOverAnimation.Stat(I18n.t("stolen.statGifts"), totalGifts),
+                            GameOverAnimation.Stat(I18n.t("stolen.statHouses"), housesRobbed)
                         ),
                         newBest = caughtBest,
                         confetti = false,
@@ -260,14 +261,14 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             gameOver.drawText(worldWidth, worldHeight)
             return
         }
-        game.drawText("Gifts: $totalGifts", 28f, worldHeight - 24f, 2f, centered = false)
-        game.drawText("House $level", 28f, worldHeight - 64f, 1.5f, centered = false)
+        game.drawText(I18n.t("stolen.gifts", totalGifts), 28f, worldHeight - 24f, 2f, centered = false)
+        game.drawText(I18n.t("stolen.house", level), 28f, worldHeight - 64f, 1.5f, centered = false)
 
         val hint = when {
             state != State.PLAYING -> ""
-            carried > 0 && treeGifts == 0 -> "Escape through the fireplace!"
-            carried > 0 -> "Sack: $carried  -  Escape through the fireplace"
-            else -> "Sneak to the tree and steal the gifts"
+            carried > 0 && treeGifts == 0 -> I18n.t("stolen.hintEscape")
+            carried > 0 -> I18n.t("stolen.hintSack", carried)
+            else -> I18n.t("stolen.hintSneak")
         }
         if (hint.isNotEmpty()) game.drawText(hint, worldWidth / 2f, worldHeight - 70f, 1.3f)
         if (bannerTimer > 0f && state == State.PLAYING) {
@@ -280,8 +281,8 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
         when (state) {
             State.ESCAPED -> {
-                game.drawText("House robbed!", worldWidth / 2f, worldHeight * 0.58f, 4f, Palette.GOLD)
-                game.drawText("+$lastGain gifts", worldWidth / 2f, worldHeight * 0.46f, 2.2f)
+                game.drawText(I18n.t("stolen.robbed"), worldWidth / 2f, worldHeight * 0.58f, 4f, Palette.GOLD)
+                game.drawText(I18n.t("stolen.gain", lastGain), worldWidth / 2f, worldHeight * 0.46f, 2.2f)
             }
             State.CAUGHT, State.GAME_OVER, State.PLAYING -> Unit
         }

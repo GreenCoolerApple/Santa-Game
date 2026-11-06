@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.ui
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -20,6 +21,8 @@ class PauseMenu(private val game: SantaGame) {
 
     fun layout(width: Float, height: Float) {
         pauseButton.set(width - SIZE - MARGIN, height - SIZE - MARGIN, SIZE, SIZE)
+        resumeButton.label = I18n.t("pause.resume")
+        menuButton.label = I18n.t("pause.menu")
         hitArea.set(pauseButton.x - 20f, pauseButton.y - 20f, SIZE + 40f, SIZE + 40f)
         resumeButton.place(width / 2f, height * 0.48f, 380f, 92f)
         menuButton.place(width / 2f, height * 0.32f, 380f, 92f)
@@ -69,7 +72,7 @@ class PauseMenu(private val game: SantaGame) {
     }
 
     fun drawOverlayText(width: Float, height: Float) {
-        game.drawText("PAUSED", width / 2f, height * 0.7f, 4.5f, Palette.GOLD)
+        game.drawText(I18n.t("pause.title"), width / 2f, height * 0.7f, 4.5f, Palette.GOLD)
         resumeButton.drawLabel(game, 2.4f)
         menuButton.drawLabel(game, 2.4f)
     }

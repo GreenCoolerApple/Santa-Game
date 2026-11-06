@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Santa-Game"
 
-include(":core", ":android")
+include(":core", ":android", ":lwjgl3")

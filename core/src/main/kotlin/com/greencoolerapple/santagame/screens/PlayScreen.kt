@@ -1,6 +1,7 @@
 package com.greencoolerapple.santagame.screens
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.MathUtils
 import com.greencoolerapple.santagame.SantaGame
 import com.greencoolerapple.santagame.ui.PauseMenu
@@ -18,6 +19,10 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
 
     protected open fun cameraShake(): Float = 0f
 
+    protected open fun worldProjection(shakeX: Float, shakeY: Float): Matrix4? = null
+
+    protected open fun drawOverlay(shapes: ShapeRenderer) {}
+
     override fun render(delta: Float) {
         val dt = minOf(delta, 1f / 20f)
         game.touches.update(game.viewport)
@@ -31,11 +36,21 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
         if (!canPause) pauseMenu.paused = false
 
         val shake = if (pauseMenu.paused) 0f else cameraShake()
-        beginFrame(MathUtils.random(-shake, shake), MathUtils.random(-shake, shake))
+        val shakeX = MathUtils.random(-shake, shake)
+        val shakeY = MathUtils.random(-shake, shake)
+        val world = worldProjection(shakeX, shakeY)
+        if (world == null) beginFrame(shakeX, shakeY) else beginFrame()
 
         val shapes = game.shapes
+        if (world != null) shapes.projectionMatrix = world
         shapes.begin(ShapeRenderer.ShapeType.Filled)
         drawWorld(shapes)
+        if (world != null) {
+            shapes.end()
+            shapes.projectionMatrix = game.camera.combined
+            shapes.begin(ShapeRenderer.ShapeType.Filled)
+        }
+        drawOverlay(shapes)
         if (canPause) pauseMenu.drawButton(shapes)
         shapes.end()
 

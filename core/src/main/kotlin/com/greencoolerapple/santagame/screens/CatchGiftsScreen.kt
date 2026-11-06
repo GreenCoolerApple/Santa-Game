@@ -1,5 +1,6 @@
 package com.greencoolerapple.santagame.screens
 
+import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -136,12 +137,12 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
             state = State.GAME_OVER
             val newBest = game.finishCatchGame(score)
             gameOver.start(
-                title = "GAME OVER",
+                title = I18n.t("catch.gameOver"),
                 color = Palette.HEART,
                 style = GameOverAnimation.Style.DROP,
                 stats = listOf(
-                    GameOverAnimation.Stat("Gifts saved", score),
-                    GameOverAnimation.Stat("Time", elapsed.toInt())
+                    GameOverAnimation.Stat(I18n.t("catch.statGifts"), score),
+                    GameOverAnimation.Stat(I18n.t("catch.statTime"), elapsed.toInt())
                 ),
                 newBest = newBest,
                 confetti = true,
@@ -177,8 +178,8 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
             gameOver.drawText(worldWidth, worldHeight)
             return
         }
-        game.drawText("Score: $score", 28f, worldHeight - 28f, 2.4f, centered = false)
-        game.drawText("Best: ${game.bestScore(GameMode.CATCH_GIFTS)}", 28f, worldHeight - 78f, 1.6f, centered = false)
+        game.drawText(I18n.t("score", score), 28f, worldHeight - 28f, 2.4f, centered = false)
+        game.drawText(I18n.t("best", game.bestScore(GameMode.CATCH_GIFTS)), 28f, worldHeight - 78f, 1.6f, centered = false)
     }
 
     private fun drawLives(shapes: ShapeRenderer) {
