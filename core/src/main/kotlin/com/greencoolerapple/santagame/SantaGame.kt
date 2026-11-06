@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.screens.MenuScreen
 import com.greencoolerapple.santagame.world.Scenery
 
@@ -28,9 +29,9 @@ class SantaGame : Game() {
     val camera = OrthographicCamera()
     val viewport = ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera)
 
-    var bestScore = 0
-        private set
+    val touches = Touches()
 
+    private val bestScores = IntArray(GameMode.entries.size)
     private val layout = GlyphLayout()
     private lateinit var prefs: Preferences
 
@@ -43,15 +44,19 @@ class SantaGame : Game() {
         }
         scenery = Scenery()
         prefs = Gdx.app.getPreferences(PREFS_NAME)
-        bestScore = prefs.getInteger(KEY_BEST, 0)
+        for (mode in GameMode.entries) {
+            bestScores[mode.ordinal] = prefs.getInteger(mode.prefsKey, 0)
+        }
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         setScreen(MenuScreen(this))
     }
 
-    fun submitScore(score: Int): Boolean {
-        if (score <= bestScore) return false
-        bestScore = score
-        prefs.putInteger(KEY_BEST, score)
+    fun bestScore(mode: GameMode): Int = bestScores[mode.ordinal]
+
+    fun submitScore(mode: GameMode, score: Int): Boolean {
+        if (score <= bestScores[mode.ordinal]) return false
+        bestScores[mode.ordinal] = score
+        prefs.putInteger(mode.prefsKey, score)
         prefs.flush()
         return true
     }
@@ -79,6 +84,5 @@ class SantaGame : Game() {
         const val WORLD_HEIGHT = 720f
         const val GROUND_HEIGHT = 90f
         private const val PREFS_NAME = "santa-game"
-        private const val KEY_BEST = "best"
     }
 }

@@ -23,6 +23,50 @@ object Palette {
     val HEART_EMPTY: Color = Color.valueOf("3a4560")
     val TEXT: Color = Color.valueOf("ffffff")
     val TEXT_SHADOW: Color = Color(0f, 0f, 0f, 0.45f)
+    val OVERLAY: Color = Color(0f, 0f, 0f, 0.6f)
+    val BUTTON: Color = Color.valueOf("c62828")
+    val BUTTON_EDGE: Color = Color.valueOf("7f1414")
+    val BUTTON_ALT: Color = Color.valueOf("1f7a4d")
+    val BUTTON_ALT_EDGE: Color = Color.valueOf("0f4a2d")
+    val PAUSE_BG: Color = Color(0f, 0f, 0f, 0.45f)
+    val JOYSTICK_BASE: Color = Color(1f, 1f, 1f, 0.15f)
+    val JOYSTICK_KNOB: Color = Color(1f, 1f, 1f, 0.4f)
+
+    val WALL: Color = Color.valueOf("3a2420")
+    val FLOOR: Color = Color.valueOf("8a5a3b")
+    val FLOOR_LINE: Color = Color.valueOf("7a4e33")
+    val RUG: Color = Color.valueOf("8e2a2a")
+    val RUG_BORDER: Color = Color.valueOf("c9a24a")
+    val BRICK: Color = Color.valueOf("9c3d2e")
+    val HEARTH: Color = Color.valueOf("1d1212")
+    val FIRE: Color = Color.valueOf("ff8a2a")
+    val FIRE_CORE: Color = Color.valueOf("ffd166")
+    val TREE: Color = Color.valueOf("1e6b3a")
+    val TREE_LIGHT: Color = Color.valueOf("2f8a4e")
+    val STEAL_ZONE: Color = Color(1f, 0.82f, 0.3f, 0.1f)
+    val CONE: Color = Color(1f, 0.95f, 0.6f, 0.16f)
+    val CONE_ALERT: Color = Color(1f, 0.25f, 0.2f, 0.28f)
+    val SHADOW: Color = Color(0f, 0f, 0f, 0.25f)
+    val HAIR: Color = Color.valueOf("3b2416")
+    val SACK: Color = Color.valueOf("8b5e34")
+    val METER_BG: Color = Color(0f, 0f, 0f, 0.5f)
+    val METER_SAFE: Color = Color.valueOf("4caf50")
+    val METER_DANGER: Color = Color.valueOf("ff3b30")
+
+    val FURNITURE: List<Color> = listOf(
+        Color.valueOf("6d2e46"),
+        Color.valueOf("5b3a24"),
+        Color.valueOf("4a2f1f"),
+        Color.valueOf("2f5d50"),
+        Color.valueOf("6b4a2e"),
+        Color.valueOf("22222a")
+    )
+
+    val PAJAMAS: List<Color> = listOf(
+        Color.valueOf("4a6fd1"),
+        Color.valueOf("8e5bd6"),
+        Color.valueOf("2a9d8f")
+    )
 
     val GIFT_BOXES: List<Color> = listOf(
         Color.valueOf("e63946"),

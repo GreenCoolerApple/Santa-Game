@@ -6,17 +6,29 @@
 
 A Christmas game made with Kotlin and libGDX.
 
+## Game modes
+
+### Catch Gifts
+
 Help Santa catch the falling gifts before they hit the snow, and stay away from the coal. You have three lives: dropping a gift or catching coal costs one.
 
-## Controls
-
 - Touch and drag to move Santa
-- Arrow keys or A/D also work when a keyboard is connected
-- Back returns to the menu
+- Arrow keys or A/D on a keyboard
+
+### Stolen Gifts
+
+Sneak into people's houses through the fireplace, steal the gifts under the Christmas tree and escape the way you came in without being seen. The family walks around with flashlights: if their light finds you, the detection meter fills up, and when it is full you are caught. Furniture blocks their view. Every house has more people, faster patrols and more gifts, and taking every gift from the tree gives a bonus.
+
+- Touch anywhere and drag to use the virtual joystick
+- WASD or arrow keys on a keyboard
+
+## Pause
+
+Both modes have a pause button in the top right corner. The Android back button also pauses, and the game pauses itself when the app goes to the background.
 
 ## Project structure
 
-- `core` — the game itself (screens, Santa, falling items, scenery)
+- `core` — the game itself (screens, Santa, falling items, scenery, houses and guards)
 - `android` — Android launcher, manifest and icons
 - `assets` — game assets shared by every platform
 

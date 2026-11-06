@@ -2,24 +2,22 @@ package com.greencoolerapple.santagame.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector2
+import com.greencoolerapple.santagame.GameMode
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.world.FallingItem
 import com.greencoolerapple.santagame.world.Santa
 import com.greencoolerapple.santagame.world.Sparkles
 
-class GameScreen(game: SantaGame) : BaseScreen(game) {
+class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private enum class State { PLAYING, GAME_OVER }
 
     private val santa = Santa(SantaGame.WORLD_WIDTH / 2f, SantaGame.GROUND_HEIGHT - 4f)
     private val items = mutableListOf<FallingItem>()
     private val sparkles = Sparkles()
-    private val touch = Vector2()
-    private val overlay = Color(0f, 0f, 0f, 0.55f)
 
     private var state = State.PLAYING
     private var score = 0
@@ -30,22 +28,17 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
     private var shakeTimer = 0f
     private var newBest = false
 
+    override val canPause: Boolean
+        get() = state == State.PLAYING
+
     override fun show() {
         santa.x = worldWidth / 2f
         santa.targetX = santa.x
     }
 
-    override fun render(delta: Float) {
-        val dt = minOf(delta, 1f / 20f)
-        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(MenuScreen(game))
-            return
-        }
-        update(dt)
-        draw()
-    }
+    override fun cameraShake(): Float = if (shakeTimer > 0f) shakeTimer / SHAKE_DURATION * SHAKE_STRENGTH else 0f
 
-    private fun update(delta: Float) {
+    override fun update(delta: Float) {
         game.scenery.update(delta)
         sparkles.update(delta)
         shakeTimer = maxOf(0f, shakeTimer - delta)
@@ -55,7 +48,7 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
             State.GAME_OVER -> {
                 santa.idle(delta)
                 overTimer += delta
-                if (overTimer > RESTART_DELAY && (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Keys.SPACE))) {
+                if (overTimer > RESTART_DELAY && (game.touches.firstJustDown() >= 0 || Gdx.input.isKeyJustPressed(Input.Keys.SPACE))) {
                     restart()
                 }
             }
@@ -65,10 +58,12 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
     private fun updatePlaying(delta: Float) {
         elapsed += delta
 
-        if (Gdx.input.isTouched) {
-            touch.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-            game.viewport.unproject(touch)
-            santa.targetX = touch.x
+        val touches = game.touches
+        for (i in 0 until Touches.MAX_POINTERS) {
+            if (touches.isFree(i)) {
+                santa.targetX = touches.x[i]
+                break
+            }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             santa.targetX = santa.x - KEYBOARD_SPEED * delta
@@ -138,7 +133,7 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
         if (lives <= 0) {
             state = State.GAME_OVER
             overTimer = 0f
-            newBest = game.submitScore(score)
+            newBest = game.submitScore(GameMode.CATCH_GIFTS, score)
         }
     }
 
@@ -153,12 +148,7 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
         state = State.PLAYING
     }
 
-    private fun draw() {
-        val shake = if (shakeTimer > 0f) shakeTimer / SHAKE_DURATION * SHAKE_STRENGTH else 0f
-        beginFrame(MathUtils.random(-shake, shake), MathUtils.random(-shake, shake))
-
-        val shapes = game.shapes
-        shapes.begin(ShapeRenderer.ShapeType.Filled)
+    override fun drawWorld(shapes: ShapeRenderer) {
         game.scenery.drawBackground(shapes, worldWidth, worldHeight)
         for (item in items) item.draw(shapes)
         santa.draw(shapes)
@@ -166,30 +156,29 @@ class GameScreen(game: SantaGame) : BaseScreen(game) {
         game.scenery.drawSnow(shapes, worldWidth)
         drawLives(shapes)
         if (state == State.GAME_OVER) {
-            shapes.color = overlay
+            shapes.color = Palette.OVERLAY
             shapes.rect(-SHAKE_STRENGTH, -SHAKE_STRENGTH, worldWidth + SHAKE_STRENGTH * 2f, worldHeight + SHAKE_STRENGTH * 2f)
         }
-        shapes.end()
+    }
 
-        val batch = game.batch
-        batch.begin()
+    override fun drawHud() {
         game.drawText("Score: $score", 28f, worldHeight - 28f, 2.4f, centered = false)
-        game.drawText("Best: ${game.bestScore}", 28f, worldHeight - 78f, 1.6f, centered = false)
+        game.drawText("Best: ${game.bestScore(GameMode.CATCH_GIFTS)}", 28f, worldHeight - 78f, 1.6f, centered = false)
         if (state == State.GAME_OVER) {
             game.drawText("GAME OVER", worldWidth / 2f, worldHeight * 0.66f, 4.5f, Palette.HEART)
             game.drawText("Gifts saved: $score", worldWidth / 2f, worldHeight * 0.53f, 2.2f)
             if (newBest) game.drawText("New best!", worldWidth / 2f, worldHeight * 0.45f, 2f, Palette.GOLD)
             if (overTimer > RESTART_DELAY) game.drawText("Tap to play again", worldWidth / 2f, worldHeight * 0.34f, 2f)
         }
-        batch.end()
     }
 
     private fun drawLives(shapes: ShapeRenderer) {
         val size = 36f
         val gap = 14f
-        val top = worldHeight - 40f
+        val top = worldHeight - 56f
+        val right = pauseMenu.pauseButton.x - 36f
         for (i in 0 until MAX_LIVES) {
-            val cx = worldWidth - 40f - i * (size + gap)
+            val cx = right - i * (size + gap)
             shapes.color = if (i < lives) Palette.HEART else Palette.HEART_EMPTY
             shapes.circle(cx - size * 0.25f, top, size * 0.28f, 16)
             shapes.circle(cx + size * 0.25f, top, size * 0.28f, 16)
