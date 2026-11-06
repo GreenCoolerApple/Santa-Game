@@ -44,6 +44,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private var shakeTimer = 0f
     private var caughtBest = false
     private var bannerTimer = 0f
+    private var seenThisHouse = false
     private var bannerText = ""
 
     override val canPause: Boolean
@@ -77,6 +78,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         treeGifts = minOf(MAX_TREE_GIFTS, 3 + level)
         carried = 0
         stealTimer = 0f
+        seenThisHouse = false
         detection = 0f
         stateTimer = 0f
         joystick.release()
@@ -160,6 +162,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             guard.update(delta, sees, santa.position)
             if (sees) {
                 spotted = true
+                seenThisHouse = true
                 val closeness = 1f - minOf(1f, guard.position.dst(santa.position) / Guard.VIEW_RANGE)
                 detection += (1.3f + closeness * 2.4f) * delta
             }
@@ -197,6 +200,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             housesRobbed++
             carried = 0
             game.checkpointStolenRun(level + 1, totalGifts, housesRobbed, lastGain)
+            game.awards.onHouseRobbed(housesRobbed, treeGifts == 0, !seenThisHouse)
             joystick.release()
             sparkles.burst(santa.position.x, santa.position.y, Palette.FIRE_CORE, 24)
             state = State.ESCAPED

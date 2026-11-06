@@ -34,15 +34,20 @@ You are a boy lost in a snowy city at night, and the green sick people are looki
 ## Menus
 
 - **Game Mode** — pick Catch Gifts, Stolen Gifts or Escape from the Santa City
+- **Awards** — the game's achievements, with your progress
 - **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), Save Game and Load Game
 
 The language starts as the system language and can be changed at any time.
+
+## Awards
+
+There are 18 awards: five for each game mode and three general ones (play every mode, save to a slot, change the language). When you earn one, a golden card slides in from the top of the screen wherever you are. Awards are stored in the save data, and loading a slot never removes awards you already earned.
 
 ## Save system
 
 The game uses its own binary save format instead of platform preferences. Every file starts with a signature, a format version and a type, followed by the payload and a CRC32 checksum, and is written to a temporary file first and then swapped in, so an interrupted write never leaves a broken save behind. Damaged files are detected and ignored.
 
-- `saves/autosave.sav` — best scores, stats and the current Stolen Gifts run, updated automatically
+- `saves/autosave.sav` — best scores, stats, awards and the current Stolen Gifts run, updated automatically
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
 - `saves/settings.sav` — options such as the FPS limit and language, kept separate so loading a slot never changes them
 

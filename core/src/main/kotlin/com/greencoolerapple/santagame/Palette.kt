@@ -73,6 +73,17 @@ object Palette {
     val EXIT_RING: Color = Color.valueOf("7dff9a")
     val CANDY_STRIPE: Color = Color.valueOf("ffffff")
 
+    val BUTTON_GOLD: Color = Color.valueOf("b8860b")
+    val BUTTON_GOLD_EDGE: Color = Color.valueOf("6e4f06")
+    val TOAST_BG: Color = Color.valueOf("1c2540")
+    val GOLD_LIGHT: Color = Color.valueOf("fff1b8")
+    val LOCK: Color = Color.valueOf("6b7590")
+    val LOCK_BG: Color = Color.valueOf("1a2135")
+    val CARD: Color = Color.valueOf("15203a")
+    val CARD_UNLOCKED: Color = Color.valueOf("3d2c0a")
+    val CARD_EDGE: Color = Color.valueOf("33405e")
+    val TEXT_DIM: Color = Color.valueOf("9aa4bf")
+
     val FURNITURE: List<Color> = listOf(
         Color.valueOf("6d2e46"),
         Color.valueOf("5b3a24"),

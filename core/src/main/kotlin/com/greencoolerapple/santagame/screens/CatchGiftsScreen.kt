@@ -60,6 +60,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
 
     private fun updatePlaying(delta: Float) {
         elapsed += delta
+        game.awards.onCatchProgress(score, elapsed)
 
         val touches = game.touches
         for (i in 0 until Touches.MAX_POINTERS) {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -11,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.greencoolerapple.santagame.awards.Award
+import com.greencoolerapple.santagame.awards.AwardTracker
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.save.GameData
@@ -33,6 +36,7 @@ class SantaGame : Game() {
     val viewport = ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera)
     val touches = Touches()
     val saves = SaveSystem()
+    val awards = AwardTracker(this)
 
     var data = GameData()
         private set
@@ -55,13 +59,28 @@ class SantaGame : Game() {
         settings = saves.loadSettings() ?: Settings()
         limiter.fps = settings.fps
         I18n.language = settings.language
+        awards.checkExplorer()
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         setScreen(MainMenuScreen(this))
     }
 
     override fun render() {
         super.render()
+        drawAwardPopup()
         limiter.sync()
+    }
+
+    private fun drawAwardPopup() {
+        val width = viewport.worldWidth
+        val height = viewport.worldHeight
+        viewport.apply()
+        camera.position.set(width / 2f, height / 2f, 0f)
+        camera.update()
+        shapes.projectionMatrix = camera.combined
+        batch.projectionMatrix = camera.combined
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        awards.render(Gdx.graphics.deltaTime, width, height)
     }
 
     private fun importLegacyScores(): GameData {
@@ -87,9 +106,11 @@ class SantaGame : Game() {
         settings.cycleLanguage(step)
         I18n.language = settings.language
         saves.saveSettings(settings)
+        awards.unlock(Award.POLYGLOT)
     }
 
     fun saveToSlot(index: Int): Boolean {
+        awards.unlock(Award.SAFE_KEEPING)
         data.savedAt = System.currentTimeMillis()
         val ok = saves.saveData(saves.slotFile(index), data)
         persist()
@@ -98,7 +119,9 @@ class SantaGame : Game() {
 
     fun loadFromSlot(index: Int): Boolean {
         val loaded = saves.loadData(saves.slotFile(index)) ?: return false
+        val earned = data.awards
         data.copyFrom(loaded)
+        data.awards = data.awards or earned
         persist()
         return true
     }
@@ -116,6 +139,7 @@ class SantaGame : Game() {
         val best = score > data.bestEscape
         if (best) data.bestEscape = score
         persist()
+        awards.checkExplorer()
         return best
     }
 
@@ -125,6 +149,7 @@ class SantaGame : Game() {
         val best = score > data.bestCatch
         if (best) data.bestCatch = score
         persist()
+        awards.checkExplorer()
         return best
     }
 
@@ -142,6 +167,7 @@ class SantaGame : Game() {
         val best = gifts > data.bestStolen
         if (best) data.bestStolen = gifts
         persist()
+        awards.checkExplorer()
         return best
     }
 

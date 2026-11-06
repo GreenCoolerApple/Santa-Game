@@ -47,6 +47,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
     private var shakeTimer = 0f
     private var bannerTimer = 0f
     private var caughtBest = false
+    private var chasedThisCity = false
 
     private val score: Int
         get() = candyCount + cities * CITY_BONUS
@@ -74,6 +75,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         }
         joystick.release()
         sparkles.clear()
+        chasedThisCity = false
         cameraPosition.set(boy.position)
         state = State.PLAYING
         stateTimer = 0f
@@ -133,7 +135,10 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         boy.move(input, delta, BOY_SPEED, map)
 
         val chaseSpeed = minOf(MAX_CHASE_SPEED, 196f + level * 8f)
-        for (s in sick) s.update(delta, boy.position, map, WANDER_SPEED, chaseSpeed)
+        for (s in sick) {
+            s.update(delta, boy.position, map, WANDER_SPEED, chaseSpeed)
+            if (s.chasing) chasedThisCity = true
+        }
         for (i in sick.indices) {
             for (j in i + 1 until sick.size) sick[i].pushAway(sick[j], map)
         }
@@ -144,6 +149,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
             if (candy.dst(boy.position) < CANDY_RADIUS) {
                 iterator.remove()
                 candyCount++
+                game.awards.onCandy(candyCount)
                 sparkles.burst(candy.x, candy.y, Palette.GOLD, 10)
             }
         }
@@ -160,6 +166,7 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
 
         if (boy.position.dst(map.exit) < EXIT_RADIUS) {
             cities++
+            game.awards.onCityEscaped(cities, !chasedThisCity)
             state = State.ESCAPED
             stateTimer = 0f
             joystick.release()

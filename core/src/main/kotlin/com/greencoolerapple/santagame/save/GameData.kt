@@ -19,6 +19,7 @@ class GameData {
     var candiesEaten = 0
     var escapeGames = 0
     var citiesEscaped = 0
+    var awards = 0L
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -38,6 +39,7 @@ class GameData {
         candiesEaten = other.candiesEaten
         escapeGames = other.escapeGames
         citiesEscaped = other.citiesEscaped
+        awards = other.awards
     }
 
     fun clearRun() {
@@ -63,6 +65,7 @@ class GameData {
             out.writeInt(candiesEaten)
             out.writeInt(escapeGames)
             out.writeInt(citiesEscaped)
+            out.writeLong(awards)
         }
         return bytes.toByteArray()
     }
@@ -84,6 +87,9 @@ class GameData {
                 candiesEaten = input.readInt().coerceAtLeast(0)
                 escapeGames = input.readInt().coerceAtLeast(0)
                 citiesEscaped = input.readInt().coerceAtLeast(0)
+            }
+            if (input.available() >= 8) {
+                awards = input.readLong()
             }
         }
     }

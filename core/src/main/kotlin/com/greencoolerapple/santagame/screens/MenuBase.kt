@@ -27,6 +27,10 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
 
     protected open fun drawTexts() {}
 
+    protected open fun drawContentShapes(shapes: ShapeRenderer) {}
+
+    protected open val showSanta: Boolean = true
+
     protected fun showToast(message: String) {
         toast = message
         toastTimer = TOAST_TIME
@@ -69,8 +73,9 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         val shapes = game.shapes
         shapes.begin(ShapeRenderer.ShapeType.Filled)
         game.scenery.drawBackground(shapes, worldWidth, worldHeight)
-        santa.draw(shapes)
+        if (showSanta) santa.draw(shapes)
         game.scenery.drawSnow(shapes, worldWidth)
+        drawContentShapes(shapes)
         for (button in buttons) button.drawShape(shapes)
         shapes.end()
 

@@ -11,7 +11,8 @@ class Button(
     var sublabel: String? = null,
     var fill: Color = Palette.BUTTON,
     var edge: Color = Palette.BUTTON_EDGE,
-    var labelScale: Float = 2.4f
+    var labelScale: Float = 2.4f,
+    var sublabelColor: Color = Palette.GOLD
 ) {
     val bounds = Rectangle()
 
@@ -38,7 +39,7 @@ class Button(
             game.drawText(label, cx, cy, scale, alpha = alpha)
         } else {
             game.drawText(label, cx, cy + bounds.height * 0.13f, scale, alpha = alpha)
-            game.drawText(sub, cx, cy - bounds.height * 0.24f, scale * 0.55f, Palette.GOLD, alpha = alpha)
+            game.drawText(sub, cx, cy - bounds.height * 0.24f, scale * 0.55f, sublabelColor, alpha = alpha)
         }
     }
 }
