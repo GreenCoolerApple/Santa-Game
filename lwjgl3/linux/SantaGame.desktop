@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Santa Game
+Comment=A Christmas game
+Comment[pt_BR]=Um jogo de Natal
+Exec="@DIR@/bin/SantaGame"
+Path=@DIR@
+Icon=@DIR@/lib/SantaGame.png
+Terminal=false
+Categories=Game;

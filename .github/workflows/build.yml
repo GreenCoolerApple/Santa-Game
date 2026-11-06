@@ -41,6 +41,34 @@ jobs:
           path: Santa-Android.apk
           if-no-files-found: error
 
+      - name: Package Linux app
+        run: |
+          mkdir -p linux-input
+          cp lwjgl3/build/dist/SantaGame.jar linux-input/
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version 0.1.0 \
+            --vendor GreenCoolerApple \
+            --input linux-input \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.png \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
+            --java-options "-Dfile.encoding=UTF-8" \
+            --dest linux-package
+          cp lwjgl3/linux/SantaGame.desktop lwjgl3/linux/install.sh linux-package/SantaGame/
+          chmod +x linux-package/SantaGame/install.sh
+          tar -czf Santa-Linux.tar.gz -C linux-package SantaGame
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-Linux
+          path: Santa-Linux.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
       - name: Upload desktop jar
         uses: actions/upload-artifact@v4
         with:

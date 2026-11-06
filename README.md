@@ -4,7 +4,7 @@
 
 # Santa Game
 
-A Christmas game made with Kotlin and libGDX, for Android and Windows, in English and Portuguese (Brazil).
+A Christmas game made with Kotlin and libGDX, for Android, Windows and Linux, in English and Portuguese (Brazil).
 
 ## Game modes
 
@@ -79,7 +79,7 @@ The game uses its own binary save format instead of platform preferences. Every 
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
 - `saves/settings.sav` — options such as the FPS limit, language, music volume and haptics, kept separate so loading a slot never changes them
 
-On Android the saves live in the app's private storage. On Windows they live in `.santa-game/saves` inside your user folder.
+On Android the saves live in the app's private storage. On Windows and Linux they live in `.santa-game/saves` inside your user folder.
 
 ## Pause
 
@@ -89,7 +89,7 @@ Every mode has a pause button in the top right corner. The Android back button a
 
 - `core` — the game itself (screens, modes, save system, translations)
 - `android` — Android launcher, manifest and icons
-- `lwjgl3` — Windows (desktop) launcher and packaging
+- `lwjgl3` — desktop launcher (Windows and Linux) and packaging
 - `assets` — game assets shared by every platform, including the bitmap font
 
 The font is generated from Inter Bold, licensed under the SIL Open Font License 1.1 (see `assets/fonts/Inter-LICENSE.txt`).
@@ -106,7 +106,17 @@ Requires JDK 17, plus the Android SDK for the Android build.
 
 The APK is written to `android/build/outputs/apk/debug/`, and `dist` writes a runnable `SantaGame.jar` to `lwjgl3/build/dist/`.
 
-GitHub Actions builds the APK and the desktop jar together in one Gradle run on Linux, then a Windows runner only packages the jar with a trimmed Java runtime. Two artifacts come out of every push to `main`:
+GitHub Actions builds the APK and the desktop jar together in one Gradle run on Linux and packages the Linux app right there, then a Windows runner only packages the jar. Both desktop builds bundle a trimmed Java runtime. Three artifacts come out of every push to `main`:
 
 - `Santa-Android` — the Android APK
 - `Santa-Windows` — a ready-to-run Windows folder with `SantaGame.exe` and a bundled Java runtime
+- `Santa-Linux` — `Santa-Linux.tar.gz` with a ready-to-run `SantaGame` folder and a bundled Java runtime
+
+### Running on Linux
+
+```bash
+tar -xzf Santa-Linux.tar.gz
+./SantaGame/bin/SantaGame
+```
+
+To add Santa Game to your applications menu, run `./SantaGame/install.sh` once from the extracted folder.
