@@ -30,4 +30,4 @@ Requires JDK 17 and the Android SDK.
 
 The APK is written to `android/build/outputs/apk/debug/`.
 
-GitHub Actions builds debug and release APKs on every push to `main`.
+GitHub Actions builds `Santa-Android.apk` on every push to `main`.

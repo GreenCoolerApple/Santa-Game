@@ -28,21 +28,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build APKs
+      - name: Build APK
         run: |
           chmod +x gradlew
-          ./gradlew :android:assembleDebug :android:assembleRelease --stacktrace
+          ./gradlew :android:assembleDebug --parallel --build-cache
+          mv android/build/outputs/apk/debug/*.apk Santa-Android.apk
 
-      - name: Upload debug APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: SantaGame-Debug
-          path: android/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-
-      - name: Upload release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SantaGame-Release
-          path: android/build/outputs/apk/release/*.apk
+          name: Santa-Android
+          path: Santa-Android.apk
           if-no-files-found: error
