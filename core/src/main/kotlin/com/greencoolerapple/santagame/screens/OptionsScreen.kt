@@ -15,6 +15,7 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
     private val rows = listOf(
         Row("options.fps", { game.settings.fpsLabel }, { game.changeFps(it) }),
         Row("options.language", { game.settings.language.label }, { game.changeLanguage(it) }),
+        Row("options.music", { game.settings.musicLabel }, { game.changeMusicVolume(it) }),
         Row("options.haptics", { game.settings.hapticsLabel }, { game.toggleHaptics() }),
         Row("options.hapticsIntensity", { game.settings.intensityLabel }, { game.changeHapticIntensity(it) })
     )
@@ -28,12 +29,12 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
 
     override fun layout() {
         for ((i, row) in rows.withIndex()) {
-            row.y = worldHeight * (0.74f - i * 0.12f)
-            row.down.place(worldWidth / 2f + 10f, row.y, 70f, 62f)
-            row.up.place(worldWidth / 2f + 430f, row.y, 70f, 62f)
+            row.y = worldHeight * (0.765f - i * 0.1f)
+            row.down.place(worldWidth / 2f + 10f, row.y, 70f, 56f)
+            row.up.place(worldWidth / 2f + 430f, row.y, 70f, 56f)
         }
-        saveButton.place(worldWidth / 2f - 200f, worldHeight * 0.23f, 360f, 82f)
-        loadButton.place(worldWidth / 2f + 200f, worldHeight * 0.23f, 360f, 82f)
+        saveButton.place(worldWidth / 2f - 200f, worldHeight * 0.215f, 360f, 76f)
+        loadButton.place(worldWidth / 2f + 200f, worldHeight * 0.215f, 360f, 76f)
         back.place(worldWidth / 2f, worldHeight * 0.08f, 260f, 62f)
         saveButton.label = I18n.t("options.save")
         loadButton.label = I18n.t("options.load")
@@ -62,7 +63,7 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
     }
 
     override fun drawTexts() {
-        game.drawText(I18n.t("options.title"), worldWidth / 2f, worldHeight * 0.9f, 4.2f, Palette.GOLD)
+        game.drawText(I18n.t("options.title"), worldWidth / 2f, worldHeight * 0.9f, 3.8f, Palette.GOLD)
         for (row in rows) {
             game.drawText(I18n.t(row.labelKey), worldWidth / 2f - 440f, row.y + 14f, 1.9f, Palette.GOLD, centered = false)
             game.drawText(row.value(), worldWidth / 2f + 220f, row.y, 2.2f)

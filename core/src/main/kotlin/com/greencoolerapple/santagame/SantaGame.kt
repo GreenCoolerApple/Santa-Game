@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.Screen
+import com.greencoolerapple.santagame.audio.MusicPlayer
 import com.greencoolerapple.santagame.awards.Award
 import com.greencoolerapple.santagame.awards.AwardTracker
 import com.greencoolerapple.santagame.haptics.Haptics
@@ -21,6 +23,8 @@ import com.greencoolerapple.santagame.save.GameData
 import com.greencoolerapple.santagame.save.SaveSystem
 import com.greencoolerapple.santagame.save.Settings
 import com.greencoolerapple.santagame.screens.IntroScreen
+import com.greencoolerapple.santagame.screens.MenuBase
+import com.greencoolerapple.santagame.screens.PlayScreen
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.world.Scenery
@@ -41,6 +45,7 @@ class SantaGame : Game() {
     val saves = SaveSystem()
     val awards = AwardTracker(this)
     val haptics = Haptics { settings }
+    val music = MusicPlayer { settings }
 
     var data = GameData()
         private set
@@ -72,6 +77,7 @@ class SantaGame : Game() {
     override fun render() {
         super.render()
         haptics.update(Gdx.graphics.deltaTime)
+        music.update(Gdx.graphics.deltaTime)
         drawAwardPopup()
         limiter.sync()
     }
@@ -131,6 +137,20 @@ class SantaGame : Game() {
         applyCosmetics()
         persist()
         return true
+    }
+
+    override fun setScreen(screen: Screen?) {
+        when (screen) {
+            is IntroScreen -> music.play(MusicPlayer.Track.INTRO, 0f)
+            is MenuBase -> music.play(MusicPlayer.Track.MENU)
+            is PlayScreen -> music.stop()
+        }
+        super.setScreen(screen)
+    }
+
+    fun changeMusicVolume(step: Int) {
+        settings.cycleMusic(step)
+        saves.saveSettings(settings)
     }
 
     fun toggleHaptics() {
@@ -267,6 +287,7 @@ class SantaGame : Game() {
 
     override fun dispose() {
         screen?.dispose()
+        music.dispose()
         batch.dispose()
         shapes.dispose()
         font.dispose()

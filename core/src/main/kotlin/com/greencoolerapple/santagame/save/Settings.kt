@@ -11,6 +11,7 @@ class Settings {
     var language = Language.system()
     var haptics = true
     var hapticIntensity = DEFAULT_INTENSITY
+    var musicVolume = DEFAULT_MUSIC
 
     val fpsLabel: String
         get() = if (fps <= 0) I18n.t("options.max") else fps.toString()
@@ -20,6 +21,9 @@ class Settings {
 
     val intensityLabel: String
         get() = "$hapticIntensity%"
+
+    val musicLabel: String
+        get() = if (musicVolume == 0) I18n.t("options.off") else "$musicVolume%"
 
     fun cycleFps(step: Int) {
         val index = FPS_OPTIONS.indexOf(fps).let { if (it < 0) FPS_OPTIONS.indexOf(DEFAULT_FPS) else it }
@@ -36,6 +40,11 @@ class Settings {
         hapticIntensity = INTENSITY_OPTIONS[(index + step).mod(INTENSITY_OPTIONS.size)]
     }
 
+    fun cycleMusic(step: Int) {
+        val index = MUSIC_OPTIONS.indexOf(musicVolume).let { if (it < 0) MUSIC_OPTIONS.indexOf(DEFAULT_MUSIC) else it }
+        musicVolume = MUSIC_OPTIONS[(index + step).mod(MUSIC_OPTIONS.size)]
+    }
+
     fun encode(): ByteArray {
         val bytes = ByteArrayOutputStream()
         DataOutputStream(bytes).use { out ->
@@ -43,6 +52,7 @@ class Settings {
             out.writeInt(language.ordinal)
             out.writeBoolean(haptics)
             out.writeInt(hapticIntensity)
+            out.writeInt(musicVolume)
         }
         return bytes.toByteArray()
     }
@@ -50,6 +60,8 @@ class Settings {
     companion object {
         const val DEFAULT_FPS = 60
         const val DEFAULT_INTENSITY = 75
+        const val DEFAULT_MUSIC = 75
+        val MUSIC_OPTIONS = intArrayOf(0, 25, 50, 75, 100)
         val FPS_OPTIONS = intArrayOf(30, 60, 90, 120, 0)
         val INTENSITY_OPTIONS = intArrayOf(25, 50, 75, 100)
 
@@ -64,6 +76,10 @@ class Settings {
                 haptics = input.readBoolean()
                 val intensity = input.readInt()
                 hapticIntensity = if (intensity in INTENSITY_OPTIONS) intensity else DEFAULT_INTENSITY
+            }
+            if (input.available() >= 4) {
+                val volume = input.readInt()
+                musicVolume = if (volume in MUSIC_OPTIONS) volume else DEFAULT_MUSIC
             }
         }
     }

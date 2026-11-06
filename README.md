@@ -36,11 +36,20 @@ You are a boy lost in a snowy city at night, and the green sick people are looki
 - **Game Mode** — pick Catch Gifts, Stolen Gifts or Escape from the Santa City
 - **Awards** — the game's achievements, with your progress
 - **Shop** — spend your golden gifts on outfits and perks
-- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), haptics on/off, haptics intensity (25% to 100%), Save Game and Load Game
+- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), music volume, haptics on/off, haptics intensity (25% to 100%), Save Game and Load Game
 
 The game opens with a short intro (Santa's sleigh crossing the moon) that can be skipped with a tap.
 
 The language starts as the system language and can be changed at any time.
+
+## Music
+
+The intro and the menus have their own original music, composed and synthesized for the game:
+
+- `assets/music/intro.ogg` — a short piece that follows the intro: rising bells as the moon comes up, sleigh bells while the sleigh crosses it and a big chord when the title lands
+- `assets/music/menu.ogg` — a cozy Christmas waltz in F major (celesta, music box, bass, soft strings and sleigh bells) that loops seamlessly
+
+The menu music keeps playing while you move between menu screens and fades out when a game starts. The volume (Off, 25% to 100%) is in Options.
 
 ## Golden gifts and Shop
 
@@ -64,7 +73,7 @@ The game uses its own binary save format instead of platform preferences. Every 
 
 - `saves/autosave.sav` — best scores, stats, awards, golden gifts, Shop items and the current Stolen Gifts run, updated automatically
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
-- `saves/settings.sav` — options such as the FPS limit, language and haptics, kept separate so loading a slot never changes them
+- `saves/settings.sav` — options such as the FPS limit, language, music volume and haptics, kept separate so loading a slot never changes them
 
 On Android the saves live in the app's private storage. On Windows they live in `.santa-game/saves` inside your user folder.
 
