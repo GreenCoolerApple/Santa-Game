@@ -21,7 +21,8 @@ enum class Award(private val key: String) {
     EXPLORER("explorer"),
     SAFE_KEEPING("safeKeeping"),
     POLYGLOT("polyglot"),
-    SHOPPER("shopper");
+    SHOPPER("shopper"),
+    TALKING_APPLE("talkingApple");
 
     val bit: Long
         get() = 1L shl ordinal

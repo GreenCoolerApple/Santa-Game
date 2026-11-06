@@ -25,6 +25,7 @@ class GameData {
     var owned = 0L
     var suit = 0
     var jacket = 0
+    var appleMeetings = 0
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -50,6 +51,7 @@ class GameData {
         owned = other.owned
         suit = other.suit
         jacket = other.jacket
+        appleMeetings = other.appleMeetings
     }
 
     fun clearRun() {
@@ -81,6 +83,7 @@ class GameData {
             out.writeLong(owned)
             out.writeInt(suit)
             out.writeInt(jacket)
+            out.writeInt(appleMeetings)
         }
         return bytes.toByteArray()
     }
@@ -112,6 +115,9 @@ class GameData {
                 owned = input.readLong()
                 suit = input.readInt().coerceAtLeast(0)
                 jacket = input.readInt().coerceAtLeast(0)
+            }
+            if (input.available() >= 4) {
+                appleMeetings = input.readInt().coerceAtLeast(0)
             }
         }
     }

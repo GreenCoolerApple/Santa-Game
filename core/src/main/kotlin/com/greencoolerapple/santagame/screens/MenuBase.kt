@@ -30,6 +30,14 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
 
     protected open fun drawContentShapes(shapes: ShapeRenderer) {}
 
+    protected open fun drawOverlayShapes(shapes: ShapeRenderer) {}
+
+    protected open fun drawOverlayTexts() {}
+
+    protected open fun interceptTap(x: Float, y: Float): Boolean = false
+
+    protected open fun interceptBack(): Boolean = false
+
     protected open val showSanta: Boolean = true
 
     protected open val toastY: Float
@@ -56,8 +64,8 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         layout()
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            onBack()
-            return
+            if (!interceptBack()) onBack()
+            if (game.screen !== this) return
         }
 
         val pointer = game.touches.firstJustDown()
@@ -65,7 +73,7 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
             game.touches.claim(pointer)
             val x = game.touches.x[pointer]
             val y = game.touches.y[pointer]
-            val hit = buttons.firstOrNull { it.contains(x, y) }
+            val hit = if (interceptTap(x, y)) null else buttons.firstOrNull { it.contains(x, y) }
             if (hit != null) {
                 game.haptics.play(Haptics.Pattern.TAP)
                 onTap(hit)
@@ -90,6 +98,13 @@ abstract class MenuBase(game: SantaGame) : BaseScreen(game) {
         if (toastTimer > 0f) {
             game.drawText(toast, worldWidth / 2f, toastY, 1.8f, Palette.GOLD, alpha = minOf(1f, toastTimer * 2f))
         }
+        game.batch.end()
+
+        shapes.begin(ShapeRenderer.ShapeType.Filled)
+        drawOverlayShapes(shapes)
+        shapes.end()
+        game.batch.begin()
+        drawOverlayTexts()
         game.batch.end()
     }
 

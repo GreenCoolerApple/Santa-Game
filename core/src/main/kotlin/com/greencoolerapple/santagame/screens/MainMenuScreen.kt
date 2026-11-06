@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
 import com.greencoolerapple.santagame.awards.Award
+import com.greencoolerapple.santagame.easter.GreenApple
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.ui.Button
 import com.greencoolerapple.santagame.ui.Draw
@@ -17,7 +18,26 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
 
     override val buttons = listOf(gameModeButton, awardsButton, shopButton, optionsButton)
 
+    private val apple = GreenApple(game)
+
+    override fun show() {
+        apple.roll()
+    }
+
+    override fun interceptTap(x: Float, y: Float): Boolean = apple.handleTap(x, y)
+
+    override fun interceptBack(): Boolean = apple.handleBack()
+
+    override fun drawOverlayShapes(shapes: ShapeRenderer) {
+        apple.drawShapes(shapes)
+    }
+
+    override fun drawOverlayTexts() {
+        apple.drawTexts()
+    }
+
     override fun layout() {
+        apple.update(Gdx.graphics.deltaTime, worldWidth, worldHeight)
         gameModeButton.label = I18n.t("menu.gameMode")
         awardsButton.label = I18n.t("menu.awards")
         awardsButton.sublabel = "${game.awards.unlockedCount} / ${Award.entries.size}"

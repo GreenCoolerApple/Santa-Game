@@ -52,6 +52,8 @@ class SantaGame : Game() {
     var settings = Settings()
         private set
 
+    var appleRolled = false
+
     private val layout = GlyphLayout()
     private val textColor = Color()
     private val limiter = FrameLimiter()
@@ -255,6 +257,22 @@ class SantaGame : Game() {
         return best
     }
 
+    fun wrapText(text: String, scale: Float, maxWidth: Float): List<String> {
+        val lines = mutableListOf<String>()
+        var current = StringBuilder()
+        for (word in text.split(' ')) {
+            val candidate = if (current.isEmpty()) word else "$current $word"
+            if (current.isNotEmpty() && textWidth(candidate, scale) > maxWidth) {
+                lines += current.toString()
+                current = StringBuilder(word)
+            } else {
+                current = StringBuilder(candidate)
+            }
+        }
+        if (current.isNotEmpty()) lines += current.toString()
+        return lines
+    }
+
     fun textWidth(text: String, scale: Float): Float {
         font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
@@ -268,17 +286,20 @@ class SantaGame : Game() {
         scale: Float,
         color: Color = Palette.TEXT,
         centered: Boolean = true,
-        alpha: Float = 1f
+        alpha: Float = 1f,
+        shadow: Boolean = true
     ) {
         if (alpha <= 0f) return
         font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
         val drawX = if (centered) x - layout.width / 2f else x
         val drawY = if (centered) y + layout.height / 2f else y
-        textColor.set(Palette.TEXT_SHADOW)
-        textColor.a *= alpha
-        font.color = textColor
-        font.draw(batch, text, drawX + scale, drawY - scale)
+        if (shadow) {
+            textColor.set(Palette.TEXT_SHADOW)
+            textColor.a *= alpha
+            font.color = textColor
+            font.draw(batch, text, drawX + scale, drawY - scale)
+        }
         textColor.set(color)
         textColor.a *= alpha
         font.color = textColor
