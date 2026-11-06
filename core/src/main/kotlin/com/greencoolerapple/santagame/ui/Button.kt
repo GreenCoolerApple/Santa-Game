@@ -6,7 +6,13 @@ import com.badlogic.gdx.math.Rectangle
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
 
-class Button(var label: String, var sublabel: String? = null) {
+class Button(
+    var label: String,
+    var sublabel: String? = null,
+    var fill: Color = Palette.BUTTON,
+    var edge: Color = Palette.BUTTON_EDGE,
+    var labelScale: Float = 2.4f
+) {
     val bounds = Rectangle()
 
     fun place(centerX: Float, centerY: Float, width: Float, height: Float) {
@@ -15,36 +21,24 @@ class Button(var label: String, var sublabel: String? = null) {
 
     fun contains(x: Float, y: Float): Boolean = bounds.contains(x, y)
 
-    fun drawShape(shapes: ShapeRenderer, fill: Color = Palette.BUTTON, edge: Color = Palette.BUTTON_EDGE) {
+    fun drawShape(shapes: ShapeRenderer, fill: Color = this.fill, edge: Color = this.edge) {
+        if (bounds.width <= 1f || bounds.height <= 1f) return
         val r = bounds.height * 0.25f
         shapes.color = edge
-        roundedRect(shapes, bounds.x - 4f, bounds.y - 6f, bounds.width + 8f, bounds.height + 10f, r + 4f)
+        Draw.roundedRect(shapes, bounds.x - 4f, bounds.y - 6f, bounds.width + 8f, bounds.height + 10f, r + 4f)
         shapes.color = fill
-        roundedRect(shapes, bounds.x, bounds.y, bounds.width, bounds.height, r)
+        Draw.roundedRect(shapes, bounds.x, bounds.y, bounds.width, bounds.height, r)
     }
 
-    fun drawLabel(game: SantaGame, scale: Float) {
+    fun drawLabel(game: SantaGame, scale: Float = labelScale, alpha: Float = 1f) {
         val cx = bounds.x + bounds.width / 2f
         val cy = bounds.y + bounds.height / 2f
         val sub = sublabel
         if (sub == null) {
-            game.drawText(label, cx, cy, scale)
+            game.drawText(label, cx, cy, scale, alpha = alpha)
         } else {
-            game.drawText(label, cx, cy + bounds.height * 0.13f, scale)
-            game.drawText(sub, cx, cy - bounds.height * 0.24f, scale * 0.55f, Palette.GOLD)
-        }
-    }
-
-    companion object {
-        fun roundedRect(shapes: ShapeRenderer, x: Float, y: Float, width: Float, height: Float, radius: Float) {
-            val r = minOf(radius, width / 2f, height / 2f)
-            shapes.rect(x + r, y, width - r * 2f, height)
-            shapes.rect(x, y + r, r, height - r * 2f)
-            shapes.rect(x + width - r, y + r, r, height - r * 2f)
-            shapes.circle(x + r, y + r, r, 16)
-            shapes.circle(x + width - r, y + r, r, 16)
-            shapes.circle(x + r, y + height - r, r, 16)
-            shapes.circle(x + width - r, y + height - r, r, 16)
+            game.drawText(label, cx, cy + bounds.height * 0.13f, scale, alpha = alpha)
+            game.drawText(sub, cx, cy - bounds.height * 0.24f, scale * 0.55f, Palette.GOLD, alpha = alpha)
         }
     }
 }

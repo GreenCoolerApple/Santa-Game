@@ -22,6 +22,21 @@ Sneak into people's houses through the fireplace, steal the gifts under the Chri
 - Touch anywhere and drag to use the virtual joystick
 - WASD or arrow keys on a keyboard
 
+Your Stolen Gifts run is saved after every house you rob, so you can leave and continue from the same house later.
+
+## Menus
+
+- **Game Mode** — pick Catch Gifts or Stolen Gifts
+- **Options** — FPS limit (30, 60, 90, 120 or Max), Save Game and Load Game
+
+## Save system
+
+The game uses its own binary save format instead of platform preferences. Every file starts with a signature, a format version and a type, followed by the payload and a CRC32 checksum, and is written to a temporary file first and then swapped in, so an interrupted write never leaves a broken save behind. Damaged files are detected and ignored.
+
+- `saves/autosave.sav` — best scores, stats and the current Stolen Gifts run, updated automatically
+- `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
+- `saves/settings.sav` — options such as the FPS limit, kept separate so loading a slot never changes them
+
 ## Pause
 
 Both modes have a pause button in the top right corner. The Android back button also pauses, and the game pauses itself when the app goes to the background.

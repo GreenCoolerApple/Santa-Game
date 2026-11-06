@@ -24,7 +24,7 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
         pauseMenu.layout(worldWidth, worldHeight)
 
         if (pauseMenu.update(canPause) == PauseMenu.Action.MENU) {
-            game.setScreen(MenuScreen(game))
+            game.setScreen(MainMenuScreen(game))
             return
         }
         if (!pauseMenu.paused) update(dt)

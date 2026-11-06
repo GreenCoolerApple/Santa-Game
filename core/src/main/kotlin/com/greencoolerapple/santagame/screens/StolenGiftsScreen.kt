@@ -5,9 +5,10 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
-import com.greencoolerapple.santagame.GameMode
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.ui.Draw
+import com.greencoolerapple.santagame.ui.GameOverAnimation
 import com.greencoolerapple.santagame.ui.Joystick
 import com.greencoolerapple.santagame.world.Sparkles
 import com.greencoolerapple.santagame.world.house.Guard
@@ -24,6 +25,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private val sparkles = Sparkles()
     private val input = Vector2()
     private val meterColor = Color()
+    private val gameOver = GameOverAnimation(game)
 
     private lateinit var house: HouseLayout
 
@@ -39,12 +41,22 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private var stateTimer = 0f
     private var time = 0f
     private var shakeTimer = 0f
-    private var newBest = false
+    private var caughtBest = false
+    private var bannerTimer = 0f
+    private var bannerText = ""
 
     override val canPause: Boolean
         get() = state == State.PLAYING
 
     override fun show() {
+        val data = game.data
+        if (data.hasRun) {
+            level = data.runHouse
+            totalGifts = data.runGifts
+            housesRobbed = data.runHouses
+            bannerText = "Continuing from House $level"
+            bannerTimer = BANNER_TIME
+        }
         startHouse()
     }
 
@@ -75,7 +87,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         level = 1
         totalGifts = 0
         housesRobbed = 0
-        newBest = false
+        bannerTimer = 0f
         startHouse()
     }
 
@@ -83,6 +95,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         time += delta
         sparkles.update(delta)
         shakeTimer = maxOf(0f, shakeTimer - delta)
+        bannerTimer = maxOf(0f, bannerTimer - delta)
 
         when (state) {
             State.PLAYING -> updatePlaying(delta)
@@ -98,12 +111,32 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 if (stateTimer > CAUGHT_DELAY) {
                     state = State.GAME_OVER
                     stateTimer = 0f
+                    gameOver.start(
+                        title = "CAUGHT!",
+                        color = Palette.METER_DANGER,
+                        style = GameOverAnimation.Style.STAMP,
+                        stats = listOf(
+                            GameOverAnimation.Stat("Gifts stolen", totalGifts),
+                            GameOverAnimation.Stat("Houses robbed", housesRobbed)
+                        ),
+                        newBest = caughtBest,
+                        confetti = false,
+                        width = worldWidth,
+                        height = worldHeight
+                    )
                 }
             }
             State.GAME_OVER -> {
-                stateTimer += delta
-                if (stateTimer > RESTART_DELAY && (game.touches.firstJustDown() >= 0 || Gdx.input.isKeyJustPressed(Input.Keys.SPACE))) {
-                    restart()
+                val before = gameOver.time
+                gameOver.update(delta)
+                if (before < gameOver.stampImpact && gameOver.time >= gameOver.stampImpact) {
+                    shakeTimer = SHAKE_DURATION
+                    Gdx.input.vibrate(60)
+                }
+                when (gameOver.handleInput()) {
+                    GameOverAnimation.Action.RETRY -> restart()
+                    GameOverAnimation.Action.MENU -> game.setScreen(GameModeScreen(game))
+                    GameOverAnimation.Action.NONE -> Unit
                 }
             }
         }
@@ -138,7 +171,9 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             stateTimer = 0f
             shakeTimer = SHAKE_DURATION
             Gdx.input.vibrate(200)
-            newBest = game.submitScore(GameMode.STOLEN_GIFTS, totalGifts)
+            joystick.release()
+            stealTimer = 0f
+            caughtBest = game.finishStolenRun(totalGifts)
             return
         }
 
@@ -160,6 +195,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             totalGifts += lastGain
             housesRobbed++
             carried = 0
+            game.checkpointStolenRun(level + 1, totalGifts, housesRobbed, lastGain)
             joystick.release()
             sparkles.burst(santa.position.x, santa.position.y, Palette.FIRE_CORE, 24)
             state = State.ESCAPED
@@ -191,12 +227,21 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         }
 
         if (state == State.PLAYING) joystick.draw(shapes)
-        drawMeter(shapes)
-
+        if (state == State.CAUGHT || state == State.GAME_OVER) drawIris(shapes)
         if (state == State.GAME_OVER) {
-            shapes.color = Palette.OVERLAY
-            shapes.rect(-20f, -20f, worldWidth + 40f, worldHeight + 40f)
+            gameOver.drawShapes(shapes, worldWidth, worldHeight)
+        } else {
+            drawMeter(shapes)
         }
+    }
+
+    private fun drawIris(shapes: ShapeRenderer) {
+        val far = Vector2.len(worldWidth, worldHeight) + 200f
+        val progress = if (state == State.CAUGHT) minOf(1f, stateTimer / CAUGHT_DELAY) else 1f
+        val eased = progress * progress * (3f - 2f * progress)
+        val radius = far + (IRIS_RADIUS - far) * eased
+        shapes.color = Palette.IRIS
+        Draw.ring(shapes, santa.position.x, santa.position.y, radius, far + 400f)
     }
 
     private fun drawMeter(shapes: ShapeRenderer) {
@@ -211,6 +256,10 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
     }
 
     override fun drawHud() {
+        if (state == State.GAME_OVER) {
+            gameOver.drawText(worldWidth, worldHeight)
+            return
+        }
         game.drawText("Gifts: $totalGifts", 28f, worldHeight - 24f, 2f, centered = false)
         game.drawText("House $level", 28f, worldHeight - 64f, 1.5f, centered = false)
 
@@ -221,6 +270,9 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
             else -> "Sneak to the tree and steal the gifts"
         }
         if (hint.isNotEmpty()) game.drawText(hint, worldWidth / 2f, worldHeight - 70f, 1.3f)
+        if (bannerTimer > 0f && state == State.PLAYING) {
+            game.drawText(bannerText, worldWidth / 2f, worldHeight * 0.5f, 2.6f, Palette.GOLD, alpha = minOf(1f, bannerTimer))
+        }
 
         for (guard in guards) {
             if (guard.spotting) game.drawText("!", guard.position.x, guard.position.y + 42f, 2.6f, Palette.METER_DANGER)
@@ -231,15 +283,7 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 game.drawText("House robbed!", worldWidth / 2f, worldHeight * 0.58f, 4f, Palette.GOLD)
                 game.drawText("+$lastGain gifts", worldWidth / 2f, worldHeight * 0.46f, 2.2f)
             }
-            State.CAUGHT -> game.drawText("CAUGHT!", worldWidth / 2f, worldHeight * 0.55f, 5f, Palette.METER_DANGER)
-            State.GAME_OVER -> {
-                game.drawText("CAUGHT!", worldWidth / 2f, worldHeight * 0.68f, 4.5f, Palette.METER_DANGER)
-                game.drawText("Gifts stolen: $totalGifts", worldWidth / 2f, worldHeight * 0.55f, 2.2f)
-                game.drawText("Houses robbed: $housesRobbed", worldWidth / 2f, worldHeight * 0.47f, 1.8f)
-                if (newBest) game.drawText("New best!", worldWidth / 2f, worldHeight * 0.39f, 2f, Palette.GOLD)
-                if (stateTimer > RESTART_DELAY) game.drawText("Tap to try again", worldWidth / 2f, worldHeight * 0.29f, 2f)
-            }
-            State.PLAYING -> Unit
+            State.CAUGHT, State.GAME_OVER, State.PLAYING -> Unit
         }
     }
 
@@ -254,7 +298,8 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         private const val CLEAN_SWEEP_BONUS = 2
         private const val ESCAPE_DELAY = 1.8f
         private const val CAUGHT_DELAY = 0.9f
-        private const val RESTART_DELAY = 0.6f
+        private const val IRIS_RADIUS = 70f
+        private const val BANNER_TIME = 2.5f
         private const val SHAKE_DURATION = 0.35f
     }
 }

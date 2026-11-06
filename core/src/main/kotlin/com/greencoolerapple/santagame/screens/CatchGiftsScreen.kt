@@ -8,6 +8,7 @@ import com.greencoolerapple.santagame.GameMode
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
 import com.greencoolerapple.santagame.input.Touches
+import com.greencoolerapple.santagame.ui.GameOverAnimation
 import com.greencoolerapple.santagame.world.FallingItem
 import com.greencoolerapple.santagame.world.Santa
 import com.greencoolerapple.santagame.world.Sparkles
@@ -18,15 +19,14 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
     private val santa = Santa(SantaGame.WORLD_WIDTH / 2f, SantaGame.GROUND_HEIGHT - 4f)
     private val items = mutableListOf<FallingItem>()
     private val sparkles = Sparkles()
+    private val gameOver = GameOverAnimation(game)
 
     private var state = State.PLAYING
     private var score = 0
     private var lives = MAX_LIVES
     private var elapsed = 0f
     private var spawnTimer = 0.6f
-    private var overTimer = 0f
     private var shakeTimer = 0f
-    private var newBest = false
 
     override val canPause: Boolean
         get() = state == State.PLAYING
@@ -47,9 +47,11 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
             State.PLAYING -> updatePlaying(delta)
             State.GAME_OVER -> {
                 santa.idle(delta)
-                overTimer += delta
-                if (overTimer > RESTART_DELAY && (game.touches.firstJustDown() >= 0 || Gdx.input.isKeyJustPressed(Input.Keys.SPACE))) {
-                    restart()
+                gameOver.update(delta)
+                when (gameOver.handleInput()) {
+                    GameOverAnimation.Action.RETRY -> restart()
+                    GameOverAnimation.Action.MENU -> game.setScreen(GameModeScreen(game))
+                    GameOverAnimation.Action.NONE -> Unit
                 }
             }
         }
@@ -132,8 +134,20 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         Gdx.input.vibrate(80)
         if (lives <= 0) {
             state = State.GAME_OVER
-            overTimer = 0f
-            newBest = game.submitScore(GameMode.CATCH_GIFTS, score)
+            val newBest = game.finishCatchGame(score)
+            gameOver.start(
+                title = "GAME OVER",
+                color = Palette.HEART,
+                style = GameOverAnimation.Style.DROP,
+                stats = listOf(
+                    GameOverAnimation.Stat("Gifts saved", score),
+                    GameOverAnimation.Stat("Time", elapsed.toInt())
+                ),
+                newBest = newBest,
+                confetti = true,
+                width = worldWidth,
+                height = worldHeight
+            )
         }
     }
 
@@ -144,7 +158,6 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         lives = MAX_LIVES
         elapsed = 0f
         spawnTimer = 0.6f
-        newBest = false
         state = State.PLAYING
     }
 
@@ -152,24 +165,20 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         game.scenery.drawBackground(shapes, worldWidth, worldHeight)
         for (item in items) item.draw(shapes)
         santa.draw(shapes)
+        if (state == State.GAME_OVER) santa.drawDizzy(shapes, gameOver.time)
         sparkles.draw(shapes)
         game.scenery.drawSnow(shapes, worldWidth)
-        drawLives(shapes)
-        if (state == State.GAME_OVER) {
-            shapes.color = Palette.OVERLAY
-            shapes.rect(-SHAKE_STRENGTH, -SHAKE_STRENGTH, worldWidth + SHAKE_STRENGTH * 2f, worldHeight + SHAKE_STRENGTH * 2f)
-        }
+        if (state == State.PLAYING) drawLives(shapes)
+        if (state == State.GAME_OVER) gameOver.drawShapes(shapes, worldWidth, worldHeight)
     }
 
     override fun drawHud() {
+        if (state == State.GAME_OVER) {
+            gameOver.drawText(worldWidth, worldHeight)
+            return
+        }
         game.drawText("Score: $score", 28f, worldHeight - 28f, 2.4f, centered = false)
         game.drawText("Best: ${game.bestScore(GameMode.CATCH_GIFTS)}", 28f, worldHeight - 78f, 1.6f, centered = false)
-        if (state == State.GAME_OVER) {
-            game.drawText("GAME OVER", worldWidth / 2f, worldHeight * 0.66f, 4.5f, Palette.HEART)
-            game.drawText("Gifts saved: $score", worldWidth / 2f, worldHeight * 0.53f, 2.2f)
-            if (newBest) game.drawText("New best!", worldWidth / 2f, worldHeight * 0.45f, 2f, Palette.GOLD)
-            if (overTimer > RESTART_DELAY) game.drawText("Tap to play again", worldWidth / 2f, worldHeight * 0.34f, 2f)
-        }
     }
 
     private fun drawLives(shapes: ShapeRenderer) {
@@ -193,7 +202,6 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         private const val MAX_COAL_CHANCE = 0.4f
         private const val MAX_FALL_SPEED = 720f
         private const val KEYBOARD_SPEED = 900f
-        private const val RESTART_DELAY = 0.8f
         private const val SHAKE_DURATION = 0.3f
         private const val SHAKE_STRENGTH = 10f
     }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.greencoolerapple.santagame.Palette
+import com.greencoolerapple.santagame.ui.Draw
 
 class Santa(var x: Float, private val baseY: Float) {
     var targetX = x
@@ -75,6 +76,17 @@ class Santa(var x: Float, private val baseY: Float) {
         shapes.color = Palette.SNOW
         shapes.rect(hx - 30f, y + 114f, 60f, 13f)
         shapes.circle(hx + 30f - tilt * 2f, y + 166f, 9f, 16)
+    }
+
+    fun drawDizzy(shapes: ShapeRenderer, time: Float) {
+        val cy = baseY + 178f
+        for (i in 0 until 3) {
+            val angle = time * 220f + i * 120f
+            val sx = x + MathUtils.cosDeg(angle) * 44f
+            val sy = cy + MathUtils.sinDeg(angle) * 12f
+            shapes.color = Palette.GOLD
+            Draw.star(shapes, sx, sy, 11f, time * 180f + i * 40f)
+        }
     }
 
     companion object {

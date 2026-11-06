@@ -28,7 +28,10 @@ object Palette {
     val BUTTON_EDGE: Color = Color.valueOf("7f1414")
     val BUTTON_ALT: Color = Color.valueOf("1f7a4d")
     val BUTTON_ALT_EDGE: Color = Color.valueOf("0f4a2d")
+    val BUTTON_DARK: Color = Color.valueOf("2c3e66")
+    val BUTTON_DARK_EDGE: Color = Color.valueOf("17223d")
     val PAUSE_BG: Color = Color(0f, 0f, 0f, 0.45f)
+    val IRIS: Color = Color(0f, 0f, 0f, 0.82f)
     val JOYSTICK_BASE: Color = Color(1f, 1f, 1f, 0.15f)
     val JOYSTICK_KNOB: Color = Color(1f, 1f, 1f, 0.4f)
 

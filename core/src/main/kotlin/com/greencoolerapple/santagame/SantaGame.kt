@@ -3,7 +3,6 @@ package com.greencoolerapple.santagame
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.Preferences
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -13,7 +12,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.greencoolerapple.santagame.input.Touches
-import com.greencoolerapple.santagame.screens.MenuScreen
+import com.greencoolerapple.santagame.save.GameData
+import com.greencoolerapple.santagame.save.SaveSystem
+import com.greencoolerapple.santagame.save.Settings
+import com.greencoolerapple.santagame.screens.MainMenuScreen
 import com.greencoolerapple.santagame.world.Scenery
 
 class SantaGame : Game() {
@@ -28,12 +30,17 @@ class SantaGame : Game() {
 
     val camera = OrthographicCamera()
     val viewport = ExtendViewport(WORLD_WIDTH, WORLD_HEIGHT, camera)
-
     val touches = Touches()
+    val saves = SaveSystem()
 
-    private val bestScores = IntArray(GameMode.entries.size)
+    var data = GameData()
+        private set
+    var settings = Settings()
+        private set
+
     private val layout = GlyphLayout()
-    private lateinit var prefs: Preferences
+    private val textColor = Color()
+    private val limiter = FrameLimiter()
 
     override fun create() {
         batch = SpriteBatch()
@@ -43,32 +50,109 @@ class SantaGame : Game() {
             setUseIntegerPositions(false)
         }
         scenery = Scenery()
-        prefs = Gdx.app.getPreferences(PREFS_NAME)
-        for (mode in GameMode.entries) {
-            bestScores[mode.ordinal] = prefs.getInteger(mode.prefsKey, 0)
-        }
+        data = saves.loadData(saves.autosaveFile) ?: importLegacyScores()
+        settings = saves.loadSettings() ?: Settings()
+        limiter.fps = settings.fps
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
-        setScreen(MenuScreen(this))
+        setScreen(MainMenuScreen(this))
     }
 
-    fun bestScore(mode: GameMode): Int = bestScores[mode.ordinal]
+    override fun render() {
+        super.render()
+        limiter.sync()
+    }
 
-    fun submitScore(mode: GameMode, score: Int): Boolean {
-        if (score <= bestScores[mode.ordinal]) return false
-        bestScores[mode.ordinal] = score
-        prefs.putInteger(mode.prefsKey, score)
-        prefs.flush()
+    private fun importLegacyScores(): GameData {
+        val imported = GameData()
+        runCatching {
+            val prefs = Gdx.app.getPreferences(LEGACY_PREFS)
+            imported.bestCatch = prefs.getInteger(GameMode.CATCH_GIFTS.prefsKey, 0)
+            imported.bestStolen = prefs.getInteger(GameMode.STOLEN_GIFTS.prefsKey, 0)
+        }
+        saves.saveData(saves.autosaveFile, imported)
+        return imported
+    }
+
+    fun persist(): Boolean = saves.saveData(saves.autosaveFile, data)
+
+    fun changeFps(step: Int) {
+        settings.cycleFps(step)
+        limiter.fps = settings.fps
+        saves.saveSettings(settings)
+    }
+
+    fun saveToSlot(index: Int): Boolean {
+        data.savedAt = System.currentTimeMillis()
+        val ok = saves.saveData(saves.slotFile(index), data)
+        persist()
+        return ok
+    }
+
+    fun loadFromSlot(index: Int): Boolean {
+        val loaded = saves.loadData(saves.slotFile(index)) ?: return false
+        data.copyFrom(loaded)
+        persist()
         return true
     }
 
-    fun drawText(text: String, x: Float, y: Float, scale: Float, color: Color = Palette.TEXT, centered: Boolean = true) {
+    fun bestScore(mode: GameMode): Int = when (mode) {
+        GameMode.CATCH_GIFTS -> data.bestCatch
+        GameMode.STOLEN_GIFTS -> data.bestStolen
+    }
+
+    fun finishCatchGame(score: Int): Boolean {
+        data.catchGames++
+        data.giftsCaught += score
+        val best = score > data.bestCatch
+        if (best) data.bestCatch = score
+        persist()
+        return best
+    }
+
+    fun checkpointStolenRun(house: Int, gifts: Int, houses: Int, gained: Int) {
+        data.runHouse = house
+        data.runGifts = gifts
+        data.runHouses = houses
+        data.giftsStolen += gained
+        persist()
+    }
+
+    fun finishStolenRun(gifts: Int): Boolean {
+        data.stolenGames++
+        data.clearRun()
+        val best = gifts > data.bestStolen
+        if (best) data.bestStolen = gifts
+        persist()
+        return best
+    }
+
+    fun textWidth(text: String, scale: Float): Float {
+        font.data.setScale(scale)
+        layout.setText(font, text)
+        return layout.width
+    }
+
+    fun drawText(
+        text: String,
+        x: Float,
+        y: Float,
+        scale: Float,
+        color: Color = Palette.TEXT,
+        centered: Boolean = true,
+        alpha: Float = 1f
+    ) {
+        if (alpha <= 0f) return
         font.data.setScale(scale)
         layout.setText(font, text)
         val drawX = if (centered) x - layout.width / 2f else x
         val drawY = if (centered) y + layout.height / 2f else y
-        font.color = Palette.TEXT_SHADOW
+        textColor.set(Palette.TEXT_SHADOW)
+        textColor.a *= alpha
+        font.color = textColor
         font.draw(batch, text, drawX + scale, drawY - scale)
-        font.color = color
+        textColor.set(color)
+        textColor.a *= alpha
+        font.color = textColor
         font.draw(batch, text, drawX, drawY)
     }
 
@@ -83,6 +167,6 @@ class SantaGame : Game() {
         const val WORLD_WIDTH = 1280f
         const val WORLD_HEIGHT = 720f
         const val GROUND_HEIGHT = 90f
-        private const val PREFS_NAME = "santa-game"
+        private const val LEGACY_PREFS = "santa-game"
     }
 }
