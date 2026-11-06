@@ -92,6 +92,12 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         state = State.PLAYING
     }
 
+    override fun restartFromPause() {
+        game.data.clearRun()
+        game.persist()
+        restart()
+    }
+
     private fun restart() {
         level = 1
         playTime = 0f

@@ -125,6 +125,107 @@ jobs:
           path: package/SantaGame
           if-no-files-found: error
 
+  macos:
+    name: macOS (${{ matrix.name }})
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Apple Silicon
+            runner: macos-latest
+            artifact: Santa-macOS-AppleSilicon
+          - name: Intel
+            runner: macos-15-intel
+            artifact: Santa-macOS-Intel
+
+    steps:
+      - name: Checkout icon
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: lwjgl3/icons
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download desktop jar
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-jar
+          path: dist
+
+      - name: Package app
+        run: |
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version 1.0.0 \
+            --vendor GreenCoolerApple \
+            --input dist \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.icns \
+            --mac-package-identifier com.greencoolerapple.santagame \
+            --mac-package-name "Santa Game" \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
+            --java-options "-XstartOnFirstThread -Dfile.encoding=UTF-8" \
+            --dest package
+          codesign --force --deep --sign - package/SantaGame.app
+          ditto -c -k --keepParent package/SantaGame.app ${{ matrix.artifact }}.zip
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          compression-level: 0
+          if-no-files-found: error
+
+  ios:
+    name: iOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build IPA
+        run: |
+          chmod +x gradlew
+          ./gradlew :ios:createIPA -Probovm.iosSkipSigning=true -Probovm.archs=arm64 --stacktrace
+          IPA=$(find ios/build -name "*.ipa" | head -n 1)
+          test -n "$IPA"
+          cp "$IPA" Santa-iOS.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-iOS
+          path: Santa-iOS.ipa
+          compression-level: 0
+          if-no-files-found: error
+
+  cleanup:
+    name: Cleanup
+    needs: [windows, macos]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Remove temporary jar artifact
         uses: geekyeggo/delete-artifact@v5
         with:

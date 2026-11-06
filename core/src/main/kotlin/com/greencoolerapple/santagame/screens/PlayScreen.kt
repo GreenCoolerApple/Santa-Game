@@ -17,6 +17,8 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
 
     protected abstract fun drawHud()
 
+    protected abstract fun restartFromPause()
+
     protected open fun cameraShake(): Float = 0f
 
     protected open fun worldProjection(shakeX: Float, shakeY: Float): Matrix4? = null
@@ -28,12 +30,23 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
         game.touches.update(game.viewport)
         pauseMenu.layout(worldWidth, worldHeight)
 
-        if (pauseMenu.update(canPause) == PauseMenu.Action.MENU) {
-            game.setScreen(MainMenuScreen(game))
-            return
+        when (pauseMenu.update(dt, canPause, game.isMobile)) {
+            PauseMenu.Action.MENU -> {
+                game.setScreen(MainMenuScreen(game))
+                return
+            }
+            PauseMenu.Action.RESTART -> restartFromPause()
+            PauseMenu.Action.NONE -> Unit
         }
         if (!pauseMenu.paused) update(dt)
-        if (!canPause) pauseMenu.paused = false
+        if (!canPause && pauseMenu.paused) pauseMenu.forceClose()
+        game.music.duck(
+            when {
+                pauseMenu.paused -> PAUSED_MUSIC
+                canPause -> 1f
+                else -> RESULTS_MUSIC
+            }
+        )
 
         val shake = if (pauseMenu.paused) 0f else cameraShake()
         val shakeX = MathUtils.random(-shake, shake)
@@ -51,7 +64,7 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
             shapes.begin(ShapeRenderer.ShapeType.Filled)
         }
         drawOverlay(shapes)
-        if (canPause) pauseMenu.drawButton(shapes)
+        if (canPause && game.isMobile && !pauseMenu.paused) pauseMenu.drawButton(shapes)
         shapes.end()
 
         game.batch.begin()
@@ -60,15 +73,20 @@ abstract class PlayScreen(game: SantaGame) : BaseScreen(game) {
 
         if (pauseMenu.paused) {
             shapes.begin(ShapeRenderer.ShapeType.Filled)
-            pauseMenu.drawOverlay(shapes, worldWidth, worldHeight)
+            pauseMenu.drawOverlay(shapes)
             shapes.end()
             game.batch.begin()
-            pauseMenu.drawOverlayText(worldWidth, worldHeight)
+            pauseMenu.drawOverlayText()
             game.batch.end()
         }
     }
 
     override fun pause() {
-        if (canPause) pauseMenu.paused = true
+        if (canPause) pauseMenu.open()
+    }
+
+    companion object {
+        private const val PAUSED_MUSIC = 0.35f
+        private const val RESULTS_MUSIC = 0.6f
     }
 }

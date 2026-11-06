@@ -161,6 +161,10 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         }
     }
 
+    override fun restartFromPause() {
+        restart()
+    }
+
     private fun restart() {
         items.clear()
         sparkles.clear()
@@ -195,7 +199,7 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
         val size = 36f
         val gap = 14f
         val top = worldHeight - 56f
-        val right = pauseMenu.pauseButton.x - 36f
+        val right = if (game.isMobile) pauseMenu.pauseButton.x - 36f else worldWidth - 44f
         for (i in 0 until maxLives) {
             val cx = right - i * (size + gap)
             shapes.color = if (i < lives) Palette.HEART else Palette.HEART_EMPTY

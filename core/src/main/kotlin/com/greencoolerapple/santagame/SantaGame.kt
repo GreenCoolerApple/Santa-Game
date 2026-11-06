@@ -28,9 +28,12 @@ import com.greencoolerapple.santagame.input.Touches
 import com.greencoolerapple.santagame.save.GameData
 import com.greencoolerapple.santagame.save.SaveSystem
 import com.greencoolerapple.santagame.save.Settings
+import com.greencoolerapple.santagame.screens.CatchGiftsScreen
+import com.greencoolerapple.santagame.screens.EscapeCityScreen
 import com.greencoolerapple.santagame.screens.IntroScreen
 import com.greencoolerapple.santagame.screens.MenuBase
 import com.greencoolerapple.santagame.screens.PlayScreen
+import com.greencoolerapple.santagame.screens.StolenGiftsScreen
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.world.Scenery
@@ -56,6 +59,9 @@ class SantaGame : Game() {
 
     val isDesktop: Boolean
         get() = Gdx.app.type == Application.ApplicationType.Desktop
+
+    val isMobile: Boolean
+        get() = Gdx.app.type == Application.ApplicationType.Android || Gdx.app.type == Application.ApplicationType.iOS
 
     private val screenshots = Screenshots(this)
     private var cursor: Cursor? = null
@@ -172,9 +178,13 @@ class SantaGame : Game() {
     }
 
     override fun setScreen(screen: Screen?) {
+        music.duck(1f)
         when (screen) {
             is IntroScreen -> music.play(MusicPlayer.Track.INTRO, 0f)
             is MenuBase -> music.play(MusicPlayer.Track.MENU)
+            is CatchGiftsScreen -> music.play(MusicPlayer.Track.CATCH_GIFTS)
+            is StolenGiftsScreen -> music.play(MusicPlayer.Track.STOLEN_GIFTS)
+            is EscapeCityScreen -> music.play(MusicPlayer.Track.ESCAPE_CITY)
             is PlayScreen -> music.stop()
         }
         super.setScreen(screen)

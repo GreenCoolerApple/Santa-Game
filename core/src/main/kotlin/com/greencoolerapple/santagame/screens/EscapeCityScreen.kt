@@ -88,6 +88,10 @@ class EscapeCityScreen(game: SantaGame) : PlayScreen(game) {
         bannerTimer = BANNER_TIME
     }
 
+    override fun restartFromPause() {
+        restart()
+    }
+
     private fun restart() {
         level = 1
         playTime = 0f

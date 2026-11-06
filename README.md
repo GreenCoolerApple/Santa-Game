@@ -4,7 +4,7 @@
 
 # Santa Game
 
-A Christmas game made with Kotlin and libGDX, for Android, Windows and Linux, in English and Portuguese (Brazil).
+A Christmas game made with Kotlin and libGDX, for Android, iOS, Windows, macOS and Linux, in English and Portuguese (Brazil).
 
 ## Game modes
 
@@ -44,7 +44,7 @@ The language starts as the system language and can be changed at any time.
 
 ## Desktop extras
 
-On Windows and Linux the game uses its own Christmas cursor (a candy cane arrow with a golden star) and has a few extras:
+On Windows, macOS and Linux the game uses its own Christmas cursor (a candy cane arrow with a golden star) and has a few extras:
 
 - **Screenshots** — press **F3** to take a screenshot. The screen flashes, a camera shutter plays and the PNG is saved to `Pictures/Santa Game` in your user folder (or `.santa-game/screenshots` if there is no Pictures folder), named with the date and time.
 - **Controls** — Options has a Controls screen where every action has a main key and an alternative key: Move Up, Move Down, Move Left, Move Right, Pause, Confirm and Screenshot. Click a key and press the new one; Esc cancels, Backspace clears it and Reset restores the defaults. Esc always pauses too.
@@ -58,12 +58,15 @@ On Windows and Linux the game uses its own Christmas cursor (a candy cane arrow 
 
 ## Music
 
-The intro and the menus have their own original music, composed and synthesized for the game:
+Every part of the game has its own original music, composed and synthesized for the game:
 
-- `assets/music/intro.ogg` — a short piece that follows the intro: rising bells as the moon comes up, sleigh bells while the sleigh crosses it and a big chord when the title lands
-- `assets/music/menu.ogg` — a cozy Christmas waltz in F major (celesta, music box, bass, soft strings and sleigh bells) that loops seamlessly
+- `intro` — a short piece that follows the intro: rising bells as the moon comes up, sleigh bells while the sleigh crosses it and a big chord when the title lands
+- `menu` — a cozy Christmas waltz in F major (celesta, music box, bass, soft strings and sleigh bells)
+- `catch` — "Sleigh Dash", an upbeat 144 BPM sleigh ride in C major for Catch Gifts
+- `stolen` — "Tiptoe Thief", a sneaky pizzicato piece in D minor for Stolen Gifts
+- `escape` — "Snowstorm Chase", a tense 150 BPM chase in E minor with drums for Escape from the Santa City
 
-The menu music keeps playing while you move between menu screens and fades out when a game starts. The volume (Off, 25% to 100%) is in Options.
+All looping tracks loop seamlessly. The menu music keeps playing while you move between menu screens and crossfades into each mode's music when a game starts. The tracks are stored as OGG in `assets/music` and as M4A in `assets-ios/music`, because iOS does not play OGG. The volume (Off, 25% to 100%) is in Options.
 
 ## Easter egg: the Green Talking Apple
 
@@ -93,17 +96,21 @@ The game uses its own binary save format instead of platform preferences. Every 
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
 - `saves/settings.sav` — options such as the FPS limit, language, music volume, haptics and key bindings, kept separate so loading a slot never changes them
 
-On Android the saves live in the app's private storage. On Windows and Linux they live in `.santa-game/saves` inside your user folder.
+On Android and iOS the saves live in the app's private storage. On Windows, macOS and Linux they live in `.santa-game/saves` inside your user folder.
 
 ## Pause
 
-Every mode has a pause button in the top right corner. The Android back button also pauses, and the game pauses itself when the app goes to the background.
+On Android and iOS every mode has a pause button (with a little Santa hat) in the top right corner; on desktop you pause with Esc or your Pause key. The Android back button also pauses, and the game pauses itself when the app goes to the background.
+
+The pause menu is a Christmas panel that drops in with a bounce: a garland with blinking lights, holly in the corners, a red ribbon banner with a waving title and snow falling behind it. It has three buttons that pop in one after another: Resume, Restart and Menu. Resuming shows a short 3, 2, 1 countdown so you are ready when the game starts again, and the music gets quieter while the game is paused.
 
 ## Project structure
 
 - `core` — the game itself (screens, modes, save system, translations)
 - `android` — Android launcher, manifest and icons
-- `lwjgl3` — desktop launcher (Windows and Linux) and packaging
+- `ios` — iOS launcher (RoboVM / MobiVM), Info.plist, icons and launch screen
+- `lwjgl3` — desktop launcher (Windows, macOS and Linux) and packaging
+- `assets-ios` — iOS-only assets (M4A music)
 - `assets` — game assets shared by every platform, including the bitmap font
 
 The font is generated from Inter Bold, licensed under the SIL Open Font License 1.1 (see `assets/fonts/Inter-LICENSE.txt`).
@@ -120,11 +127,29 @@ Requires JDK 17, plus the Android SDK for the Android build.
 
 The APK is written to `android/build/outputs/apk/debug/`, and `dist` writes a runnable `SantaGame.jar` to `lwjgl3/build/dist/`.
 
-GitHub Actions builds the APK and the desktop jar together in one Gradle run on Linux and packages the Linux app right there, then a Windows runner only packages the jar. Both desktop builds bundle a trimmed Java runtime. Three artifacts come out of every push to `main`:
+GitHub Actions builds the APK and the desktop jar together in one Gradle run on Linux and packages the Linux app right there; Windows and macOS runners then only package that jar, and a separate macOS runner builds the iOS app. Every desktop build bundles a trimmed Java runtime. These artifacts come out of every push to `main`:
 
 - `Santa-Android` — the Android APK
 - `Santa-Windows` — a ready-to-run Windows folder with `SantaGame.exe` and a bundled Java runtime
 - `Santa-Linux` — `Santa-Linux.tar.gz` with a ready-to-run `SantaGame` folder and a bundled Java runtime
+- `Santa-macOS-AppleSilicon` and `Santa-macOS-Intel` — `SantaGame.app` zipped, for M-series and Intel Macs
+- `Santa-iOS` — an unsigned `Santa-iOS.ipa`, ready to sign and sideload (AltStore, Sideloadly, TrollStore and similar)
+
+### Running on macOS
+
+The app is not notarized, so the first time macOS may block it. Right-click `SantaGame.app` and choose Open, or run:
+
+```bash
+xattr -dr com.apple.quarantine SantaGame.app
+```
+
+### iOS
+
+The iOS module is only included in the Gradle build on macOS (it needs Xcode). To build it locally on a Mac:
+
+```bash
+./gradlew :ios:createIPA -Probovm.iosSkipSigning=true -Probovm.archs=arm64
+```
 
 ### Running on Linux
 

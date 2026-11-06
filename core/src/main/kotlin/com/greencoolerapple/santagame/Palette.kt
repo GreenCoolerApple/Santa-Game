@@ -79,6 +79,8 @@ object Palette {
     val BUTTON_SHOP_EDGE: Color = Color.valueOf("4a2263")
     val TOAST_BG: Color = Color.valueOf("1c2540")
     val SILHOUETTE: Color = Color.valueOf("0a1226")
+    val PANEL_GREEN: Color = Color.valueOf("1d5c3a")
+    val PANEL_GREEN_DARK: Color = Color.valueOf("143f28")
     val APPLE: Color = Color.valueOf("7ed957")
     val APPLE_LIGHT: Color = Color.valueOf("b6f28a")
     val APPLE_DARK: Color = Color.valueOf("54aa34")

@@ -1,0 +1,43 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "com.mobidevelop.robovm:robovm-gradle-plugin:$robovmVersion"
+  }
+}
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'robovm'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+  }
+}
+
+ext {
+  mainClassName = "com.greencoolerapple.santagame.ios.IOSLauncher"
+}
+
+robovm {
+  iosSkipSigning = true
+}
+
+launchIPhoneSimulator.dependsOn build
+launchIPadSimulator.dependsOn build
+launchIOSDevice.dependsOn build
+createIPA.dependsOn build
+
+dependencies {
+  implementation project(':core')
+  implementation "com.mobidevelop.robovm:robovm-rt:$robovmVersion"
+  implementation "com.mobidevelop.robovm:robovm-cocoatouch:$robovmVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-robovm-metalangle:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+}
