@@ -42,6 +42,20 @@ The game opens with a short intro (Santa's sleigh crossing the moon) that can be
 
 The language starts as the system language and can be changed at any time.
 
+## Desktop extras
+
+On Windows and Linux the game uses its own Christmas cursor (a candy cane arrow with a golden star) and has a few extras:
+
+- **Screenshots** — press **F3** to take a screenshot. The screen flashes, a camera shutter plays and the PNG is saved to `Pictures/Santa Game` in your user folder (or `.santa-game/screenshots` if there is no Pictures folder), named with the date and time.
+- **Controls** — Options has a Controls screen where every action has a main key and an alternative key: Move Up, Move Down, Move Left, Move Right, Pause, Confirm and Screenshot. Click a key and press the new one; Esc cancels, Backspace clears it and Reset restores the defaults. Esc always pauses too.
+
+| Action | Default keys |
+|---|---|
+| Move | W A S D / arrow keys |
+| Pause | P / Esc |
+| Confirm | Space / Enter |
+| Screenshot | F3 |
+
 ## Music
 
 The intro and the menus have their own original music, composed and synthesized for the game:
@@ -77,7 +91,7 @@ The game uses its own binary save format instead of platform preferences. Every 
 
 - `saves/autosave.sav` — best scores, stats, awards, golden gifts, Shop items and the current Stolen Gifts run, updated automatically
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
-- `saves/settings.sav` — options such as the FPS limit, language, music volume and haptics, kept separate so loading a slot never changes them
+- `saves/settings.sav` — options such as the FPS limit, language, music volume, haptics and key bindings, kept separate so loading a slot never changes them
 
 On Android the saves live in the app's private storage. On Windows and Linux they live in `.santa-game/saves` inside your user folder.
 

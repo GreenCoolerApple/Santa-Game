@@ -12,7 +12,13 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Cursor
+import com.badlogic.gdx.graphics.Pixmap
+import com.greencoolerapple.santagame.capture.Screenshots
+import com.greencoolerapple.santagame.input.Action
+import com.greencoolerapple.santagame.input.Controls
 import com.greencoolerapple.santagame.audio.MusicPlayer
 import com.greencoolerapple.santagame.awards.Award
 import com.greencoolerapple.santagame.awards.AwardTracker
@@ -46,6 +52,13 @@ class SantaGame : Game() {
     val awards = AwardTracker(this)
     val haptics = Haptics { settings }
     val music = MusicPlayer { settings }
+    val controls = Controls { settings }
+
+    val isDesktop: Boolean
+        get() = Gdx.app.type == Application.ApplicationType.Desktop
+
+    private val screenshots = Screenshots(this)
+    private var cursor: Cursor? = null
 
     var data = GameData()
         private set
@@ -71,6 +84,7 @@ class SantaGame : Game() {
         limiter.fps = settings.fps
         I18n.language = settings.language
         applyCosmetics()
+        if (isDesktop) setupCursor()
         awards.checkExplorer()
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         setScreen(IntroScreen(this))
@@ -81,7 +95,23 @@ class SantaGame : Game() {
         haptics.update(Gdx.graphics.deltaTime)
         music.update(Gdx.graphics.deltaTime)
         drawAwardPopup()
+        if (isDesktop && controls.isJustPressed(Action.SCREENSHOT)) screenshots.capture()
+        screenshots.render(Gdx.graphics.deltaTime, viewport.worldWidth, viewport.worldHeight)
         limiter.sync()
+    }
+
+    private fun setupCursor() {
+        runCatching {
+            val pixmap = Pixmap(Gdx.files.internal(CURSOR_FILE))
+            val created = Gdx.graphics.newCursor(pixmap, 1, 1)
+            pixmap.dispose()
+            Gdx.graphics.setCursor(created)
+            cursor = created
+        }
+    }
+
+    fun saveControls() {
+        saves.saveSettings(settings)
     }
 
     private fun drawAwardPopup() {
@@ -309,6 +339,8 @@ class SantaGame : Game() {
     override fun dispose() {
         screen?.dispose()
         music.dispose()
+        screenshots.dispose()
+        cursor?.dispose()
         batch.dispose()
         shapes.dispose()
         font.dispose()
@@ -320,6 +352,7 @@ class SantaGame : Game() {
         const val GROUND_HEIGHT = 90f
         private const val LEGACY_PREFS = "santa-game"
         private const val FONT_FILE = "fonts/santa.fnt"
+        private const val CURSOR_FILE = "cursors/cursor.png"
         private const val FONT_RATIO = 0.42f
     }
 }

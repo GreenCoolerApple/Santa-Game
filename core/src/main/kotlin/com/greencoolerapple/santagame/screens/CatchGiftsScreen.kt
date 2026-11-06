@@ -2,12 +2,12 @@ package com.greencoolerapple.santagame.screens
 
 import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.greencoolerapple.santagame.GameMode
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Action
 import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.shop.CoinRewards
 import com.greencoolerapple.santagame.haptics.Haptics
@@ -73,10 +73,10 @@ class CatchGiftsScreen(game: SantaGame) : PlayScreen(game) {
                 break
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (game.controls.isPressed(Action.MOVE_LEFT)) {
             santa.targetX = santa.x - KEYBOARD_SPEED * delta
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (game.controls.isPressed(Action.MOVE_RIGHT)) {
             santa.targetX = santa.x + KEYBOARD_SPEED * delta
         }
         santa.update(delta, 0f, worldWidth)

@@ -2,12 +2,12 @@ package com.greencoolerapple.santagame.screens
 
 import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Action
 import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.shop.CoinRewards
 import com.greencoolerapple.santagame.haptics.Haptics
@@ -157,10 +157,11 @@ class StolenGiftsScreen(game: SantaGame) : PlayScreen(game) {
         playTime += delta
         joystick.update(game.touches)
         input.set(joystick.direction)
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) input.x = -1f
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) input.x = 1f
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) input.y = -1f
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) input.y = 1f
+        val controls = game.controls
+        if (controls.isPressed(Action.MOVE_LEFT)) input.x = -1f
+        if (controls.isPressed(Action.MOVE_RIGHT)) input.x = 1f
+        if (controls.isPressed(Action.MOVE_DOWN)) input.y = -1f
+        if (controls.isPressed(Action.MOVE_UP)) input.y = 1f
 
         val speed = SANTA_SPEED * maxOf(MIN_SPEED_FACTOR, 1f - carried * 0.04f)
         santa.move(input, delta, speed, house.blockers, house.interior)

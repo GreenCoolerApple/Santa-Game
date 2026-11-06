@@ -2,12 +2,12 @@ package com.greencoolerapple.santagame.ui
 
 import com.greencoolerapple.santagame.i18n.I18n
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Action as InputAction
 import com.greencoolerapple.santagame.haptics.Haptics
 
 class GameOverAnimation(private val game: SantaGame) {
@@ -93,7 +93,7 @@ class GameOverAnimation(private val game: SantaGame) {
 
     fun handleInput(): Action {
         if (time < buttonsAt + 0.25f) return Action.NONE
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) return Action.RETRY
+        if (game.controls.isJustPressed(InputAction.CONFIRM)) return Action.RETRY
         val touches = game.touches
         val pointer = touches.firstJustDown()
         if (pointer < 0) return Action.NONE

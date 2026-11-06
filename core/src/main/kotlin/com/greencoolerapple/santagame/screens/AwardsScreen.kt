@@ -1,13 +1,13 @@
 package com.greencoolerapple.santagame.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Action
 import com.greencoolerapple.santagame.awards.Award
 import com.greencoolerapple.santagame.awards.AwardTracker
 import com.greencoolerapple.santagame.i18n.I18n
@@ -65,8 +65,8 @@ class AwardsScreen(game: SantaGame) : MenuBase(game) {
             scroll += velocity * delta
             velocity *= maxOf(0f, 1f - delta * 5f)
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) scroll += KEY_SPEED * delta
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) scroll -= KEY_SPEED * delta
+        if (game.controls.isPressed(Action.MOVE_DOWN)) scroll += KEY_SPEED * delta
+        if (game.controls.isPressed(Action.MOVE_UP)) scroll -= KEY_SPEED * delta
         scroll = MathUtils.clamp(scroll, 0f, maxScroll)
     }
 

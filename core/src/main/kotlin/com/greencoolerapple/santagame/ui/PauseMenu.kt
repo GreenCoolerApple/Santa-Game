@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Rectangle
 import com.greencoolerapple.santagame.Palette
 import com.greencoolerapple.santagame.SantaGame
+import com.greencoolerapple.santagame.input.Action as InputAction
 import com.greencoolerapple.santagame.haptics.Haptics
 
 class PauseMenu(private val game: SantaGame) {
@@ -30,7 +31,7 @@ class PauseMenu(private val game: SantaGame) {
     }
 
     fun update(canPause: Boolean): Action {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || game.controls.isJustPressed(InputAction.PAUSE)) {
             when {
                 paused -> paused = false
                 canPause -> paused = true

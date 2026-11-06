@@ -2,6 +2,7 @@ package com.greencoolerapple.santagame.save
 
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.i18n.Language
+import com.greencoolerapple.santagame.input.Action
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -12,6 +13,7 @@ class Settings {
     var haptics = true
     var hapticIntensity = DEFAULT_INTENSITY
     var musicVolume = DEFAULT_MUSIC
+    val bindings: IntArray = Action.defaults()
 
     val fpsLabel: String
         get() = if (fps <= 0) I18n.t("options.max") else fps.toString()
@@ -53,6 +55,8 @@ class Settings {
             out.writeBoolean(haptics)
             out.writeInt(hapticIntensity)
             out.writeInt(musicVolume)
+            out.writeInt(bindings.size)
+            for (code in bindings) out.writeInt(code)
         }
         return bytes.toByteArray()
     }
@@ -62,6 +66,7 @@ class Settings {
         const val DEFAULT_INTENSITY = 75
         const val DEFAULT_MUSIC = 75
         val MUSIC_OPTIONS = intArrayOf(0, 25, 50, 75, 100)
+        private const val MAX_KEY_CODE = 255
         val FPS_OPTIONS = intArrayOf(30, 60, 90, 120, 0)
         val INTENSITY_OPTIONS = intArrayOf(25, 50, 75, 100)
 
@@ -80,6 +85,14 @@ class Settings {
             if (input.available() >= 4) {
                 val volume = input.readInt()
                 musicVolume = if (volume in MUSIC_OPTIONS) volume else DEFAULT_MUSIC
+            }
+            if (input.available() >= 4) {
+                val count = input.readInt()
+                for (i in 0 until count) {
+                    if (input.available() < 4) break
+                    val code = input.readInt()
+                    if (i < bindings.size && code in 0..MAX_KEY_CODE) bindings[i] = code
+                }
             }
         }
     }
