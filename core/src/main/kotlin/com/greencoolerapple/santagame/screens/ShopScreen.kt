@@ -34,7 +34,7 @@ class ShopScreen(game: SantaGame) : MenuBase(game) {
     private var tab = ShopItem.Tab.SKINS
     private var items = ShopItem.inTab(tab)
 
-    private var introTime = if (introSeen) SHORT_INTRO_START else 0f
+    private var introTime = if (introSeen) INTRO_END else 0f
     private var doorKnocked = introSeen
     private var scroll = 0f
     private var velocity = 0f
@@ -1101,6 +1101,10 @@ class ShopScreen(game: SantaGame) : MenuBase(game) {
     companion object {
         private var introSeen = false
 
+        fun resetIntro() {
+            introSeen = false
+        }
+
         private const val DOOR_START = 1.0f
         private const val DOOR_TIME = 0.6f
         private const val ZOOM_START = 1.3f
@@ -1108,7 +1112,6 @@ class ShopScreen(game: SantaGame) : MenuBase(game) {
         private const val INTERIOR_AT = 2.6f
         private const val INTRO_END = 3.15f
         private const val SKIP_TO = 2.45f
-        private const val SHORT_INTRO_START = 2.3f
         private const val CHALET_HALF = 280f
 
         private const val PANEL_WIDTH = 580f

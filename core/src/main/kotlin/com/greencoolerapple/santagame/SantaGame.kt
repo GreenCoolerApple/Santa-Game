@@ -33,6 +33,7 @@ import com.greencoolerapple.santagame.screens.EscapeCityScreen
 import com.greencoolerapple.santagame.screens.IntroScreen
 import com.greencoolerapple.santagame.screens.MenuBase
 import com.greencoolerapple.santagame.screens.PlayScreen
+import com.greencoolerapple.santagame.screens.ShopScreen
 import com.greencoolerapple.santagame.screens.SledRaceScreen
 import com.greencoolerapple.santagame.screens.StolenGiftsScreen
 import com.greencoolerapple.santagame.shop.Cosmetics
@@ -79,6 +80,7 @@ class SantaGame : Game() {
     private val limiter = FrameLimiter()
 
     override fun create() {
+        ShopScreen.resetIntro()
         batch = SpriteBatch()
         shapes = ShapeRenderer()
         font = BitmapFont(Gdx.files.internal(FONT_FILE)).apply {
@@ -182,6 +184,7 @@ class SantaGame : Game() {
         music.duck(1f)
         when (screen) {
             is IntroScreen -> music.play(MusicPlayer.Track.INTRO, 0f)
+            is ShopScreen -> music.play(MusicPlayer.Track.SHOP)
             is MenuBase -> music.play(MusicPlayer.Track.MENU)
             is CatchGiftsScreen -> music.play(MusicPlayer.Track.CATCH_GIFTS)
             is StolenGiftsScreen -> music.play(MusicPlayer.Track.STOLEN_GIFTS)

@@ -4,11 +4,15 @@ import java.util.Locale
 
 enum class Language(val label: String) {
     ENGLISH("English"),
-    PORTUGUESE_BR("Português (Brasil)");
+    PORTUGUESE_BR("Português (Brasil)"),
+    SPANISH("Español");
 
     companion object {
-        fun system(): Language =
-            if (Locale.getDefault().language.equals("pt", ignoreCase = true)) PORTUGUESE_BR else ENGLISH
+        fun system(): Language = when (Locale.getDefault().language.lowercase()) {
+            "pt" -> PORTUGUESE_BR
+            "es" -> SPANISH
+            else -> ENGLISH
+        }
     }
 }
 
@@ -19,6 +23,7 @@ object I18n {
         val table = when (language) {
             Language.ENGLISH -> english
             Language.PORTUGUESE_BR -> portuguese
+            Language.SPANISH -> Spanish.table
         }
         var text = table[key] ?: english[key] ?: key
         for (i in args.indices) {
