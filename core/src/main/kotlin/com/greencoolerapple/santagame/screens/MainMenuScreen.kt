@@ -182,11 +182,11 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         shapes.color = Palette.SNOW
         shapes.circle(x + 22f * s, y + 73f * s, 3.5f * s, 8)
 
-        shapes.color = Palette.SANTA_RED
+        shapes.color = Cosmetics.sled
         shapes.rect(x - 42f * s, y, 84f * s, 26f * s)
         shapes.rect(x - 42f * s, y + 22f * s, 24f * s, 18f * s)
         shapes.triangle(x + 42f * s, y, x + 42f * s, y + 26f * s, x + 56f * s, y + 30f * s)
-        shapes.color = Palette.GOLD
+        shapes.color = if (Cosmetics.sledStriped) Palette.SNOW else Palette.GOLD
         shapes.rect(x - 42f * s, y + 10f * s, 84f * s, 4f * s)
         shapes.rect(x - 48f * s, y - 12f * s, 106f * s, 4f * s)
         shapes.circle(x + 58f * s, y - 6f * s, 6f * s, 10)

@@ -71,10 +71,17 @@ class Sled(val rider: Rider) {
         circle(shapes, -17.5f, 42f, 6f)
         circle(shapes, 17.5f, 42f, 6f)
 
-        shapes.color = Palette.SLED_WOOD_DARK
+        val player = rider == Rider.SANTA
+        shapes.color = if (player) Cosmetics.sledShade else Palette.SLED_WOOD_DARK
         rect(shapes, -18f, -32f, 36f, 66f)
-        shapes.color = Palette.SLED_WOOD
-        for (k in 0 until 4) rect(shapes, -16f, -28f + k * 15f, 32f, 11f)
+        for (k in 0 until 4) {
+            shapes.color = when {
+                !player -> Palette.SLED_WOOD
+                Cosmetics.sledStriped && k % 2 == 1 -> Palette.SNOW
+                else -> Cosmetics.sled
+            }
+            rect(shapes, -16f, -28f + k * 15f, 32f, 11f)
+        }
 
         when (rider) {
             Rider.SANTA -> drawSanta(shapes)

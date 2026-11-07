@@ -21,9 +21,22 @@ enum class ShopItem(
     JACKET_PINK("jacketPink", Category.JACKET, 100, Color.valueOf("e84393")),
     PERK_EXTRA_LIFE("perkExtraLife", Category.PERK, 150, Color.valueOf("ff4d5e")),
     PERK_QUIET_BOOTS("perkQuietBoots", Category.PERK, 200, Color.valueOf("4a3a5e")),
-    PERK_FAST_SNEAKERS("perkFastSneakers", Category.PERK, 200, Color.valueOf("f5c542"));
+    PERK_FAST_SNEAKERS("perkFastSneakers", Category.PERK, 200, Color.valueOf("f5c542")),
+    SLED_WOOD("sledWood", Category.SLED, 0, Color.valueOf("8b5a2b"), Color.valueOf("5e3b1a")),
+    SLED_CANDY("sledCandy", Category.SLED, 110, Color.valueOf("d62a2a"), Color.valueOf("8f1a1a")),
+    SLED_FROST("sledFrost", Category.SLED, 140, Color.valueOf("9fdcff"), Color.valueOf("3a8fd6")),
+    SLED_GOLDEN("sledGolden", Category.SLED, 260, Color.valueOf("f5c542"), Color.valueOf("9c7412"));
 
-    enum class Category { SUIT, JACKET, PERK }
+    enum class Category { SUIT, JACKET, PERK, SLED }
+
+    enum class Tab(val key: String) { SKINS("shop.tab.skins"), COSMETICS("shop.tab.cosmetics"), PERKS("shop.tab.perks") }
+
+    val tab: Tab
+        get() = when (category) {
+            Category.SUIT, Category.JACKET -> Tab.SKINS
+            Category.SLED -> Tab.COSMETICS
+            Category.PERK -> Tab.PERKS
+        }
 
     val bit: Long
         get() = 1L shl ordinal
@@ -43,5 +56,8 @@ enum class ShopItem(
     companion object {
         val suits: List<ShopItem> = entries.filter { it.category == Category.SUIT }
         val jackets: List<ShopItem> = entries.filter { it.category == Category.JACKET }
+        val sleds: List<ShopItem> = entries.filter { it.category == Category.SLED }
+
+        fun inTab(tab: Tab): List<ShopItem> = entries.filter { it.tab == tab }
     }
 }

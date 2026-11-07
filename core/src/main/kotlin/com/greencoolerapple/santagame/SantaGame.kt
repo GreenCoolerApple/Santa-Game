@@ -223,6 +223,7 @@ class SantaGame : Game() {
     fun isEquipped(item: ShopItem): Boolean = when (item.category) {
         ShopItem.Category.SUIT -> equippedSuit() == item
         ShopItem.Category.JACKET -> equippedJacket() == item
+        ShopItem.Category.SLED -> equippedSled() == item
         ShopItem.Category.PERK -> owns(item)
     }
 
@@ -240,6 +241,7 @@ class SantaGame : Game() {
         when (item.category) {
             ShopItem.Category.SUIT -> data.suit = item.indexInCategory
             ShopItem.Category.JACKET -> data.jacket = item.indexInCategory
+            ShopItem.Category.SLED -> data.sledPaint = item.indexInCategory
             ShopItem.Category.PERK -> return
         }
         applyCosmetics()
@@ -250,8 +252,10 @@ class SantaGame : Game() {
 
     private fun equippedJacket(): ShopItem = ShopItem.jackets.getOrNull(data.jacket)?.takeIf { owns(it) } ?: ShopItem.JACKET_BLUE
 
+    private fun equippedSled(): ShopItem = ShopItem.sleds.getOrNull(data.sledPaint)?.takeIf { owns(it) } ?: ShopItem.SLED_WOOD
+
     private fun applyCosmetics() {
-        Cosmetics.apply(equippedSuit(), equippedJacket())
+        Cosmetics.apply(equippedSuit(), equippedJacket(), equippedSled())
     }
 
     fun bestScore(mode: GameMode): Int = when (mode) {

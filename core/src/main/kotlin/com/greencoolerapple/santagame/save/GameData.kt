@@ -30,6 +30,7 @@ class GameData {
     var sledRaces = 0
     var sledWins = 0
     var sledGifts = 0
+    var sledPaint = 0
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -60,6 +61,7 @@ class GameData {
         sledRaces = other.sledRaces
         sledWins = other.sledWins
         sledGifts = other.sledGifts
+        sledPaint = other.sledPaint
     }
 
     fun clearRun() {
@@ -96,6 +98,7 @@ class GameData {
             out.writeInt(sledRaces)
             out.writeInt(sledWins)
             out.writeInt(sledGifts)
+            out.writeInt(sledPaint)
         }
         return bytes.toByteArray()
     }
@@ -136,6 +139,9 @@ class GameData {
                 sledRaces = input.readInt().coerceAtLeast(0)
                 sledWins = input.readInt().coerceAtLeast(0)
                 sledGifts = input.readInt().coerceAtLeast(0)
+            }
+            if (input.available() >= 4) {
+                sledPaint = input.readInt().coerceAtLeast(0)
             }
         }
     }

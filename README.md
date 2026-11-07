@@ -44,7 +44,7 @@ The main menu is fully animated: the title letters drop in and wave, Santa's hat
 
 - **Game Mode** — pick Catch Gifts, Stolen Gifts, Escape from the Santa City or Sled Race
 - **Awards** — the game's achievements, with your progress
-- **Shop** — spend your golden gifts on outfits and perks
+- **Shop** — a cozy Christmas chalet where Pip the elf sells skins, cosmetics and perks for golden gifts
 - **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), music volume, Save Game and Load Game. On Android and iOS it also has haptics on/off and haptics intensity (25% to 100%); these are hidden on desktop, which has no vibration
 
 The game opens with a short intro (Santa's sleigh crossing the moon) that can be skipped with a tap.
@@ -84,11 +84,15 @@ Every time you open the game there is a 50% chance that the Green Apple shows up
 
 ## Golden gifts and Shop
 
-Golden gifts are the game's coins. You earn them at the end of every game: one for every 30 seconds played, plus a bonus from your score (gifts caught, gifts stolen, city points, or your place and gifts in Sled Race). The Shop sells:
+Golden gifts are the game's coins. You earn them at the end of every game: one for every 30 seconds played, plus a bonus from your score (gifts caught, gifts stolen, city points, or your place and gifts in Sled Race).
 
-- **Santa suits** — Classic, Frost, Evergreen, Royal and Golden, used in Catch Gifts, Stolen Gifts and Sled Race
-- **Boy jackets** — Blue, Orange, Green and Pink, used in Escape from the Santa City
+Opening the Shop plays a short intro: a snowy log chalet with a "SHOP" sign, string lights and a smoking chimney, the door swings open and the camera flies inside (tap to skip; after the first visit in a session it only plays the warm fade). Inside, Pip the green elf stands behind a big wooden counter with gifts, a candle and a little Christmas tree. He talks in a speech bubble, reacts to everything you buy or equip, tells you how many golden gifts you are missing and chats now and then. The products are on the right, on a candy-cane framed board with three tabs:
+
+- **Skins** — Santa suits (Classic, Frost, Evergreen, Royal and Golden, used in Catch Gifts, Stolen Gifts and Sled Race) and boy jackets (Blue, Orange, Green and Pink, used in Escape from the Santa City)
+- **Cosmetics** — sled paints (Wooden, Candy Cane, Frost and Golden) for your sled in Sled Race and Santa's sleigh in the main menu
 - **Perks** — Extra Life (4 lives in Catch Gifts), Quiet Boots (families notice you 20% slower) and Fast Sneakers (8% faster in the city)
+
+Switch tabs by tapping them or with left/right on a keyboard, and scroll the list by dragging or with up/down. On desktop, products light up when you hover over them.
 
 ## Haptics
 
