@@ -503,9 +503,9 @@ class SledRaceScreen(game: SantaGame) : PlayScreen(game) {
                 game.drawText(I18n.t("sled.go"), worldWidth / 2f, worldHeight * 0.62f, 6f + t * 4f, Palette.METER_SAFE, alpha = 1f - t)
             }
             State.FINISHED -> {
-                val pop = minOf(1f, stateTimer * 4f)
-                val wobble = MathUtils.sin(stateTimer * 8f) * 0.15f
-                game.drawText(I18n.t("sled.finish"), worldWidth / 2f, worldHeight * 0.64f, 5f * pop + wobble, Palette.GOLD)
+                val pop = maxOf(0.1f, minOf(1f, stateTimer * 4f))
+                val wobble = 1f + MathUtils.sin(stateTimer * 8f) * 0.04f
+                game.drawText(I18n.t("sled.finish"), worldWidth / 2f, worldHeight * 0.64f, 5f * pop * wobble, Palette.GOLD)
             }
             State.GAME_OVER -> Unit
         }

@@ -30,6 +30,7 @@ object I18n {
     private val english = mapOf(
         "menu.gameMode" to "Game Mode",
         "menu.options" to "Options",
+        "menu.subtitle" to "A Christmas adventure",
         "back" to "Back",
         "gameMode.title" to "GAME MODE",
         "mode.catch" to "Catch Gifts",
@@ -273,6 +274,7 @@ object I18n {
     private val portuguese = mapOf(
         "menu.gameMode" to "Modos de Jogo",
         "menu.options" to "Opções",
+        "menu.subtitle" to "Uma aventura de Natal",
         "back" to "Voltar",
         "gameMode.title" to "MODOS DE JOGO",
         "mode.catch" to "Pegar Presentes",

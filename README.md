@@ -40,6 +40,8 @@ A downhill sled race against three rivals: Comet the reindeer, Jingle the elf an
 
 ## Menus
 
+The main menu is fully animated: the title letters drop in and wave, Santa's hat sits on the "S", a garland of blinking Christmas lights hangs across the top, stars twinkle, Santa's sleigh flies across the sky now and then, the buttons pop in one after another with snow on top and holly on the Game Mode button, and on desktop the buttons grow and glow when you hover over them.
+
 - **Game Mode** — pick Catch Gifts, Stolen Gifts, Escape from the Santa City or Sled Race
 - **Awards** — the game's achievements, with your progress
 - **Shop** — spend your golden gifts on outfits and perks

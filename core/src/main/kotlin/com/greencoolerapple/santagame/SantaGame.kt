@@ -328,6 +328,7 @@ class SantaGame : Game() {
     }
 
     fun textWidth(text: String, scale: Float): Float {
+        if (scale < MIN_SCALE) return 0f
         font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
         return layout.width
@@ -343,7 +344,7 @@ class SantaGame : Game() {
         alpha: Float = 1f,
         shadow: Boolean = true
     ) {
-        if (alpha <= 0f) return
+        if (alpha <= 0f || scale < MIN_SCALE) return
         font.data.setScale(scale * FONT_RATIO)
         layout.setText(font, text)
         val drawX = if (centered) x - layout.width / 2f else x
@@ -378,5 +379,6 @@ class SantaGame : Game() {
         private const val FONT_FILE = "fonts/santa.fnt"
         private const val CURSOR_FILE = "cursors/cursor.png"
         private const val FONT_RATIO = 0.42f
+        private const val MIN_SCALE = 0.05f
     }
 }
