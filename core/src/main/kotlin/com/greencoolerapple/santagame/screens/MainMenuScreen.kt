@@ -24,13 +24,16 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
     private val shopButton = Button("", fill = Palette.BUTTON_SHOP, edge = Palette.BUTTON_SHOP_EDGE, labelScale = 2.1f, sublabelColor = Palette.GOLD_LIGHT)
     private val optionsButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = 2.4f)
 
-    override val buttons = listOf(gameModeButton, awardsButton, shopButton, optionsButton)
+    private val skinsButton = Button("", fill = Palette.BUTTON_SKINS, edge = Palette.BUTTON_SKINS_EDGE, labelScale = 2.1f)
+
+    override val buttons = listOf(gameModeButton, awardsButton, shopButton, skinsButton, optionsButton)
 
     private val slots = listOf(
         Slot(gameModeButton, 2.8f, 0),
         Slot(awardsButton, 2.1f, 1),
         Slot(shopButton, 2.1f, 2),
-        Slot(optionsButton, 2.4f, 3)
+        Slot(skinsButton, 2.1f, 3),
+        Slot(optionsButton, 2.4f, 4)
     )
 
     private val apple = GreenApple(game)
@@ -56,6 +59,7 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         shopButton.label = I18n.t("menu.shop")
         shopButton.sublabel = I18n.t("shop.balance", game.data.coins)
         optionsButton.label = I18n.t("menu.options")
+        skinsButton.label = I18n.t("menu.skins")
 
         val hovered = hoveredButton()
         val delta = Gdx.graphics.deltaTime
@@ -66,9 +70,10 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
 
         val breathe = 1f + MathUtils.sin(time * 3f) * 0.022f
         place(slots[0], worldWidth / 2f, worldHeight * 0.615f, 500f, 104f, breathe)
-        place(slots[1], worldWidth / 2f - 130f, worldHeight * 0.44f, 240f, 92f, 1f)
-        place(slots[2], worldWidth / 2f + 130f, worldHeight * 0.44f, 240f, 92f, 1f)
-        place(slots[3], worldWidth / 2f, worldHeight * 0.275f, 500f, 80f, 1f)
+        place(slots[1], worldWidth / 2f - 245f, worldHeight * 0.44f, 225f, 92f, 1f)
+        place(slots[2], worldWidth / 2f, worldHeight * 0.44f, 225f, 92f, 1f)
+        place(slots[3], worldWidth / 2f + 245f, worldHeight * 0.44f, 225f, 92f, 1f)
+        place(slots[4], worldWidth / 2f, worldHeight * 0.275f, 500f, 80f, 1f)
     }
 
     private fun appear(order: Int): Float {
@@ -95,6 +100,7 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
             gameModeButton -> game.setScreen(GameModeScreen(game))
             awardsButton -> game.setScreen(AwardsScreen(game))
             shopButton -> game.setScreen(ShopScreen(game))
+            skinsButton -> game.setScreen(SkinsScreen(game))
             optionsButton -> game.setScreen(OptionsScreen(game))
         }
     }

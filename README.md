@@ -43,8 +43,9 @@ A downhill sled race against three rivals: Comet the reindeer, Jingle the elf an
 The main menu is fully animated: the title letters drop in and wave, Santa's hat sits on the "S", a garland of blinking Christmas lights hangs across the top, stars twinkle, Santa's sleigh flies across the sky now and then, the buttons pop in one after another with snow on top and holly on the Game Mode button, and on desktop the buttons grow and glow when you hover over them.
 
 - **Game Mode** — pick Catch Gifts, Stolen Gifts, Escape from the Santa City or Sled Race
-- **Awards** — the game's achievements, with your progress
+- **Awards** — a chalet trophy room. The awards hang on a candy-cane board on the right with a progress bar, unlocked ones first. On the left, four competing green elves (Twig, Holly, Biscuit and Sprout) sit at a long table with hot cocoa, cookies and a golden trophy, chatting and laughing with each other. Tap an elf and it tells you a joke or a funny story, and the others crack up
 - **Shop** — a cozy Christmas chalet where Pip the elf sells skins, cosmetics and perks for golden gifts
+- **Skins** — a chalet dressing room. Your character stands on a rug in front of a big golden mirror on the left; switch between Santa and the Boy with the buttons below (or left/right on a keyboard). On the right are the skins for that character: tap one you own to wear it and the character pops with sparkles, locked ones show their price, and the last card takes you to the Shop
 - **Options** — FPS limit (30, 60, 90, 120 or Max), language (English, Português (Brasil) or Español), music volume, Save Game and Load Game. On Android and iOS it also has haptics on/off and haptics intensity (25% to 100%); these are hidden on desktop, which has no vibration
 
 The game opens with a short intro (Santa's sleigh crossing the moon) that can be skipped with a tap.
