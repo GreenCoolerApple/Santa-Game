@@ -35,8 +35,23 @@ jobs:
           mv android/build/outputs/apk/debug/*.apk Santa-Android.apk
 
       - name: Upload APK
+        id: upload1
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
+          name: Santa-Android
+          path: Santa-Android.apk
+          if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload1.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload APK
+        if: steps.upload1.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
           name: Santa-Android
           path: Santa-Android.apk
           if-no-files-found: error
@@ -62,6 +77,8 @@ jobs:
           tar -czf Santa-Linux.tar.gz -C linux-package SantaGame
 
       - name: Upload Linux app
+        id: upload2
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Santa-Linux
@@ -69,9 +86,40 @@ jobs:
           compression-level: 0
           if-no-files-found: error
 
-      - name: Upload desktop jar
+      - name: Wait before retrying upload
+        if: steps.upload2.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload Linux app
+        if: steps.upload2.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
+          overwrite: true
+          name: Santa-Linux
+          path: Santa-Linux.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload desktop jar
+        id: upload3
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-jar
+          path: lwjgl3/build/dist/SantaGame.jar
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload3.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload desktop jar
+        if: steps.upload3.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
           name: desktop-jar
           path: lwjgl3/build/dist/SantaGame.jar
           retention-days: 1
@@ -119,8 +167,23 @@ jobs:
             --dest package
 
       - name: Upload app
+        id: upload4
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
+          name: Santa-Windows
+          path: package/SantaGame
+          if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload4.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload app
+        if: steps.upload4.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
           name: Santa-Windows
           path: package/SantaGame
           if-no-files-found: error
@@ -179,8 +242,24 @@ jobs:
           ditto -c -k --keepParent package/SantaGame.app ${{ matrix.artifact }}.zip
 
       - name: Upload app
+        id: upload5
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload5.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload app
+        if: steps.upload5.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
           name: ${{ matrix.artifact }}
           path: ${{ matrix.artifact }}.zip
           compression-level: 0
@@ -212,8 +291,24 @@ jobs:
           cp "$IPA" Santa-iOS.ipa
 
       - name: Upload IPA
+        id: upload6
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
+          name: Santa-iOS
+          path: Santa-iOS.ipa
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload6.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry upload IPA
+        if: steps.upload6.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          overwrite: true
           name: Santa-iOS
           path: Santa-iOS.ipa
           compression-level: 0
