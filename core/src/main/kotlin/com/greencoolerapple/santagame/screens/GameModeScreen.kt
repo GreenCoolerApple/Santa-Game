@@ -7,17 +7,21 @@ import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.ui.Button
 
 class GameModeScreen(game: SantaGame) : MenuBase(game) {
-    private val catchButton = Button("", labelScale = 2.4f)
-    private val stolenButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = 2.4f)
-    private val escapeButton = Button("", fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = 2.4f)
+    private val catchButton = Button("", labelScale = LABEL_SCALE)
+    private val stolenButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = LABEL_SCALE)
+    private val escapeButton = Button("", fill = Palette.BUTTON_DARK, edge = Palette.BUTTON_DARK_EDGE, labelScale = LABEL_SCALE)
+    private val sledButton = Button("", fill = Palette.BUTTON_GOLD, edge = Palette.BUTTON_GOLD_EDGE, labelScale = LABEL_SCALE)
     private val back = backButton()
 
-    override val buttons = listOf(catchButton, stolenButton, escapeButton, back)
+    override val buttons = listOf(catchButton, stolenButton, escapeButton, sledButton, back)
 
     override fun layout() {
-        catchButton.place(worldWidth / 2f - 240f, worldHeight * 0.6f, 440f, 104f)
-        stolenButton.place(worldWidth / 2f + 240f, worldHeight * 0.6f, 440f, 104f)
-        escapeButton.place(worldWidth / 2f, worldHeight * 0.41f, 920f, 104f)
+        val left = worldWidth / 2f - COLUMN_OFFSET
+        val right = worldWidth / 2f + COLUMN_OFFSET
+        catchButton.place(left, worldHeight * 0.6f, BUTTON_WIDTH, BUTTON_HEIGHT)
+        stolenButton.place(right, worldHeight * 0.6f, BUTTON_WIDTH, BUTTON_HEIGHT)
+        escapeButton.place(left, worldHeight * 0.41f, BUTTON_WIDTH, BUTTON_HEIGHT)
+        sledButton.place(right, worldHeight * 0.41f, BUTTON_WIDTH, BUTTON_HEIGHT)
         back.place(worldWidth / 2f, worldHeight * 0.2f, 260f, 76f)
 
         catchButton.label = GameMode.CATCH_GIFTS.title
@@ -31,6 +35,8 @@ class GameModeScreen(game: SantaGame) : MenuBase(game) {
             I18n.t("best", game.bestScore(GameMode.STOLEN_GIFTS))
         }
         escapeButton.sublabel = I18n.t("best", game.bestScore(GameMode.ESCAPE_CITY))
+        sledButton.label = GameMode.SLED_RACE.title
+        sledButton.sublabel = I18n.t("best", SledRaceScreen.formatTime(game.bestScore(GameMode.SLED_RACE)))
     }
 
     override fun onTap(button: Button) {
@@ -38,6 +44,7 @@ class GameModeScreen(game: SantaGame) : MenuBase(game) {
             catchButton -> game.setScreen(CatchGiftsScreen(game))
             stolenButton -> game.setScreen(StolenGiftsScreen(game))
             escapeButton -> game.setScreen(EscapeCityScreen(game))
+            sledButton -> game.setScreen(SledRaceScreen(game))
             back -> onBack()
         }
     }
@@ -48,5 +55,12 @@ class GameModeScreen(game: SantaGame) : MenuBase(game) {
 
     override fun drawTexts() {
         game.drawText(I18n.t("gameMode.title"), worldWidth / 2f, worldHeight * 0.82f, 4.2f, Palette.GOLD)
+    }
+
+    companion object {
+        private const val LABEL_SCALE = 2.1f
+        private const val BUTTON_WIDTH = 560f
+        private const val BUTTON_HEIGHT = 112f
+        private const val COLUMN_OFFSET = 295f
     }
 }

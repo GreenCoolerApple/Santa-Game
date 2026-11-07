@@ -45,6 +45,7 @@ class SaveSlotsScreen(game: SantaGame, private val mode: Mode) : MenuBase(game) 
                     append("   ").append(I18n.t("slot.catch", data.bestCatch))
                     append("   ").append(I18n.t("slot.stolen", data.bestStolen))
                     append("   ").append(I18n.t("slot.escape", data.bestEscape))
+                    if (data.bestSledMs > 0) append("   ").append(I18n.t("slot.sled", SledRaceScreen.formatTime(data.bestSledMs)))
                     if (data.hasRun) append("   ").append(I18n.t("slot.house", data.runHouse))
                 }
             }

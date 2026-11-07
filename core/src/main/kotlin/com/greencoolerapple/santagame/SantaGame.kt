@@ -33,6 +33,7 @@ import com.greencoolerapple.santagame.screens.EscapeCityScreen
 import com.greencoolerapple.santagame.screens.IntroScreen
 import com.greencoolerapple.santagame.screens.MenuBase
 import com.greencoolerapple.santagame.screens.PlayScreen
+import com.greencoolerapple.santagame.screens.SledRaceScreen
 import com.greencoolerapple.santagame.screens.StolenGiftsScreen
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.shop.ShopItem
@@ -185,6 +186,7 @@ class SantaGame : Game() {
             is CatchGiftsScreen -> music.play(MusicPlayer.Track.CATCH_GIFTS)
             is StolenGiftsScreen -> music.play(MusicPlayer.Track.STOLEN_GIFTS)
             is EscapeCityScreen -> music.play(MusicPlayer.Track.ESCAPE_CITY)
+            is SledRaceScreen -> music.play(MusicPlayer.Track.SLED_RACE)
             is PlayScreen -> music.stop()
         }
         super.setScreen(screen)
@@ -256,6 +258,18 @@ class SantaGame : Game() {
         GameMode.CATCH_GIFTS -> data.bestCatch
         GameMode.STOLEN_GIFTS -> data.bestStolen
         GameMode.ESCAPE_CITY -> data.bestEscape
+        GameMode.SLED_RACE -> data.bestSledMs
+    }
+
+    fun finishSledRace(place: Int, millis: Int, gifts: Int): Boolean {
+        data.sledRaces++
+        if (place == 1) data.sledWins++
+        data.sledGifts += gifts
+        val best = data.bestSledMs == 0 || millis < data.bestSledMs
+        if (best) data.bestSledMs = millis
+        persist()
+        awards.checkExplorer()
+        return best
     }
 
     fun finishEscapeGame(score: Int, candies: Int, cities: Int): Boolean {

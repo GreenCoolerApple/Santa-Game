@@ -26,6 +26,10 @@ class GameData {
     var suit = 0
     var jacket = 0
     var appleMeetings = 0
+    var bestSledMs = 0
+    var sledRaces = 0
+    var sledWins = 0
+    var sledGifts = 0
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -52,6 +56,10 @@ class GameData {
         suit = other.suit
         jacket = other.jacket
         appleMeetings = other.appleMeetings
+        bestSledMs = other.bestSledMs
+        sledRaces = other.sledRaces
+        sledWins = other.sledWins
+        sledGifts = other.sledGifts
     }
 
     fun clearRun() {
@@ -84,6 +92,10 @@ class GameData {
             out.writeInt(suit)
             out.writeInt(jacket)
             out.writeInt(appleMeetings)
+            out.writeInt(bestSledMs)
+            out.writeInt(sledRaces)
+            out.writeInt(sledWins)
+            out.writeInt(sledGifts)
         }
         return bytes.toByteArray()
     }
@@ -118,6 +130,12 @@ class GameData {
             }
             if (input.available() >= 4) {
                 appleMeetings = input.readInt().coerceAtLeast(0)
+            }
+            if (input.available() >= 16) {
+                bestSledMs = input.readInt().coerceAtLeast(0)
+                sledRaces = input.readInt().coerceAtLeast(0)
+                sledWins = input.readInt().coerceAtLeast(0)
+                sledGifts = input.readInt().coerceAtLeast(0)
             }
         }
     }

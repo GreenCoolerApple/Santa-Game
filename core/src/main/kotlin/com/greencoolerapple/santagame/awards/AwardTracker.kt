@@ -52,9 +52,16 @@ class AwardTracker(private val game: SantaGame) {
         if (unchased) unlock(Award.INVISIBLE)
     }
 
+    fun onSledFinished(place: Int, seconds: Float, crashes: Int) {
+        unlock(Award.FIRST_RACE)
+        if (place == 1) unlock(Award.CHAMPION)
+        if (seconds < SPEED_DEMON_SECONDS) unlock(Award.SPEED_DEMON)
+        if (crashes == 0) unlock(Award.CLEAN_RUN)
+    }
+
     fun checkExplorer() {
         val data = game.data
-        if (data.catchGames > 0 && data.stolenGames > 0 && data.escapeGames > 0) unlock(Award.EXPLORER)
+        if (data.catchGames > 0 && data.stolenGames > 0 && data.escapeGames > 0 && data.sledRaces > 0) unlock(Award.EXPLORER)
     }
 
     fun render(delta: Float, width: Float, height: Float) {
@@ -99,6 +106,7 @@ class AwardTracker(private val game: SantaGame) {
     companion object {
         private const val SLIDE_TIME = 0.35f
         private const val TOTAL_TIME = 3.2f
+        private const val SPEED_DEMON_SECONDS = 50f
 
         fun drawTrophy(shapes: ShapeRenderer, cx: Float, cy: Float, scale: Float) {
             shapes.color = Palette.GOLD

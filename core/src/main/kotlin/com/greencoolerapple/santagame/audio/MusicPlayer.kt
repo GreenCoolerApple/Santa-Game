@@ -11,7 +11,8 @@ class MusicPlayer(private val settings: () -> Settings) {
         MENU("menu", true),
         CATCH_GIFTS("catch", true),
         STOLEN_GIFTS("stolen", true),
-        ESCAPE_CITY("escape", true);
+        ESCAPE_CITY("escape", true),
+        SLED_RACE("sled", true);
 
         val path: String
             get() = "music/$fileName." + if (Gdx.app.type == Application.ApplicationType.iOS) "m4a" else "ogg"

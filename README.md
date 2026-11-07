@@ -31,12 +31,19 @@ You are a boy lost in a snowy city at night, and the green sick people are looki
 - Touch anywhere and drag to use the virtual joystick
 - WASD or arrow keys on a keyboard
 
+### Sled Race
+
+A downhill sled race against three rivals: Comet the reindeer, Jingle the elf and Flurry the snowman. After a 3-2-1 countdown you race down a winding snowy track with candy-cane poles on the edges. Dodge rocks, trees and snowmen (a crash spins you out and almost stops you), stay out of the deep snow on the sides, which slows you down, and drive over the blue boost pads for a burst of speed. Golden gifts along the track give extra coins. Every race has a new track. The HUD shows your position, time, gifts and speed, and the bar on the right shows where every racer is. Your best time is saved.
+
+- Hold the left or right half of the screen to steer on mobile
+- A/D or the left/right arrows on a keyboard
+
 ## Menus
 
-- **Game Mode** — pick Catch Gifts, Stolen Gifts or Escape from the Santa City
+- **Game Mode** — pick Catch Gifts, Stolen Gifts, Escape from the Santa City or Sled Race
 - **Awards** — the game's achievements, with your progress
 - **Shop** — spend your golden gifts on outfits and perks
-- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), music volume, haptics on/off, haptics intensity (25% to 100%), Save Game and Load Game
+- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English or Português (Brasil)), music volume, Save Game and Load Game. On Android and iOS it also has haptics on/off and haptics intensity (25% to 100%); these are hidden on desktop, which has no vibration
 
 The game opens with a short intro (Santa's sleigh crossing the moon) that can be skipped with a tap.
 
@@ -65,6 +72,7 @@ Every part of the game has its own original music, composed and synthesized for 
 - `catch` — "Sleigh Dash", an upbeat 144 BPM sleigh ride in C major for Catch Gifts
 - `stolen` — "Tiptoe Thief", a sneaky pizzicato piece in D minor for Stolen Gifts
 - `escape` — "Snowstorm Chase", a tense 150 BPM chase in E minor with drums for Escape from the Santa City
+- `sled` — "Downhill Rush", a fast 168 BPM race theme in D major with driving drums, sleigh bells and a bright lead for Sled Race
 
 All looping tracks loop seamlessly. The menu music keeps playing while you move between menu screens and crossfades into each mode's music when a game starts. The tracks are stored as OGG in `assets/music` and as M4A in `assets-ios/music`, because iOS does not play OGG. The volume (Off, 25% to 100%) is in Options.
 
@@ -74,19 +82,19 @@ Every time you open the game there is a 50% chance that the Green Apple shows up
 
 ## Golden gifts and Shop
 
-Golden gifts are the game's coins. You earn them at the end of every game: one for every 30 seconds played, plus a bonus from your score (gifts caught, gifts stolen or city points). The Shop sells:
+Golden gifts are the game's coins. You earn them at the end of every game: one for every 30 seconds played, plus a bonus from your score (gifts caught, gifts stolen, city points, or your place and gifts in Sled Race). The Shop sells:
 
-- **Santa suits** — Classic, Frost, Evergreen, Royal and Golden, used in Catch Gifts and Stolen Gifts
+- **Santa suits** — Classic, Frost, Evergreen, Royal and Golden, used in Catch Gifts, Stolen Gifts and Sled Race
 - **Boy jackets** — Blue, Orange, Green and Pink, used in Escape from the Santa City
 - **Perks** — Extra Life (4 lives in Catch Gifts), Quiet Boots (families notice you 20% slower) and Fast Sneakers (8% faster in the city)
 
 ## Haptics
 
-Vibration uses short patterns with real intensity instead of a single buzz: a light tick when you collect something or press a button, a double pulse when you get hurt, a strong sequence when you are caught and a rising pattern when you succeed. Haptics can be turned off or set to 25%, 50%, 75% or 100% in Options.
+Vibration uses short patterns with real intensity instead of a single buzz: a light tick when you collect something or press a button, a double pulse when you get hurt, a strong sequence when you are caught and a rising pattern when you succeed. Haptics can be turned off or set to 25%, 50%, 75% or 100% in Options on Android and iOS.
 
 ## Awards
 
-There are 20 awards: five for each game mode and five general ones (play every mode, save to a slot, change the language, buy something in the Shop, meet the Green Apple). When you earn one, a golden card slides in from the top of the screen wherever you are. Awards are stored in the save data, and loading a slot never removes awards you already earned.
+There are 24 awards: five for each of the first three game modes, four for Sled Race (finish a race, win a race, finish in under 50 seconds, finish without crashing) and five general ones (play every mode, save to a slot, change the language, buy something in the Shop, meet the Green Apple). When you earn one, a golden card slides in from the top of the screen wherever you are. Awards are stored in the save data, and loading a slot never removes awards you already earned.
 
 ## Save system
 

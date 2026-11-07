@@ -22,7 +22,11 @@ enum class Award(private val key: String) {
     SAFE_KEEPING("safeKeeping"),
     POLYGLOT("polyglot"),
     SHOPPER("shopper"),
-    TALKING_APPLE("talkingApple");
+    TALKING_APPLE("talkingApple"),
+    FIRST_RACE("firstRace"),
+    CHAMPION("champion"),
+    SPEED_DEMON("speedDemon"),
+    CLEAN_RUN("cleanRun");
 
     val bit: Long
         get() = 1L shl ordinal

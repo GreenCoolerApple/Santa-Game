@@ -103,6 +103,24 @@ object Palette {
     val CARD_EDGE: Color = Color.valueOf("33405e")
     val TEXT_DIM: Color = Color.valueOf("9aa4bf")
 
+    val SLED_TRACK: Color = Color.valueOf("dfe8f8")
+    val SLED_GROOVE: Color = Color.valueOf("b7c7e3")
+    val ROCK: Color = Color.valueOf("8a93a6")
+    val ROCK_DARK: Color = Color.valueOf("5c6478")
+    val CARROT: Color = Color.valueOf("ff8c2a")
+    val BOOST: Color = Color.valueOf("29b6f6")
+    val BOOST_GLOW: Color = Color(0.4f, 0.85f, 1f, 0.35f)
+    val SLED_WOOD: Color = Color.valueOf("8b5a2b")
+    val SLED_WOOD_DARK: Color = Color.valueOf("5e3b1a")
+    val SLED_RUNNER: Color = Color.valueOf("c0c8d8")
+    val REINDEER: Color = Color.valueOf("8d5a3b")
+    val REINDEER_DARK: Color = Color.valueOf("6a4128")
+    val ANTLER: Color = Color.valueOf("d8c3a0")
+    val ELF_GREEN: Color = Color.valueOf("2e9e4f")
+    val ELF_GREEN_DARK: Color = Color.valueOf("1d6b34")
+    val SCARF_BLUE: Color = Color.valueOf("3a7bd5")
+    val PROGRESS_BG: Color = Color(0f, 0f, 0f, 0.45f)
+
     val FURNITURE: List<Color> = listOf(
         Color.valueOf("6d2e46"),
         Color.valueOf("5b3a24"),

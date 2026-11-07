@@ -15,10 +15,15 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
     private val rows = listOf(
         Row("options.fps", { game.settings.fpsLabel }, { game.changeFps(it) }),
         Row("options.language", { game.settings.language.label }, { game.changeLanguage(it) }),
-        Row("options.music", { game.settings.musicLabel }, { game.changeMusicVolume(it) }),
-        Row("options.haptics", { game.settings.hapticsLabel }, { game.toggleHaptics() }),
-        Row("options.hapticsIntensity", { game.settings.intensityLabel }, { game.changeHapticIntensity(it) })
-    )
+        Row("options.music", { game.settings.musicLabel }, { game.changeMusicVolume(it) })
+    ) + if (game.isMobile) {
+        listOf(
+            Row("options.haptics", { game.settings.hapticsLabel }, { game.toggleHaptics() }),
+            Row("options.hapticsIntensity", { game.settings.intensityLabel }, { game.changeHapticIntensity(it) })
+        )
+    } else {
+        emptyList()
+    }
     private val saveButton = Button("", labelScale = 2.2f)
     private val loadButton = Button("", fill = Palette.BUTTON_ALT, edge = Palette.BUTTON_ALT_EDGE, labelScale = 2.2f)
     private val controlsButton = Button("", fill = Palette.BUTTON_SHOP, edge = Palette.BUTTON_SHOP_EDGE, labelScale = 2.2f)
@@ -32,8 +37,10 @@ class OptionsScreen(game: SantaGame) : MenuBase(game) {
     override val showSanta: Boolean = false
 
     override fun layout() {
+        val top = if (rows.size > 3) 0.765f else 0.72f
+        val step = if (rows.size > 3) 0.1f else 0.14f
         for ((i, row) in rows.withIndex()) {
-            row.y = worldHeight * (0.765f - i * 0.1f)
+            row.y = worldHeight * (top - i * step)
             row.down.place(worldWidth / 2f + 10f, row.y, 70f, 56f)
             row.up.place(worldWidth / 2f + 430f, row.y, 70f, 56f)
         }
