@@ -12,6 +12,7 @@ import com.greencoolerapple.santagame.easter.GreenApple
 import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.ui.Button
+import com.greencoolerapple.santagame.ui.DailyPanel
 import com.greencoolerapple.santagame.ui.Draw
 
 class MainMenuScreen(game: SantaGame) : MenuBase(game) {
@@ -37,6 +38,8 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
     )
 
     private val apple = GreenApple(game)
+    private val daily = DailyPanel(game)
+    private var dailyShown = 1f
     private val mouse = Vector2()
     private val tint = Color()
     private val stars = List(STAR_COUNT) {
@@ -47,7 +50,18 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         apple.roll()
     }
 
-    override fun interceptTap(x: Float, y: Float): Boolean = apple.handleTap(x, y)
+    override fun interceptTap(x: Float, y: Float): Boolean {
+        if (apple.handleTap(x, y)) return true
+        if (apple.active) return false
+        return when (daily.handleTap(x, y)) {
+            DailyPanel.Result.WAIT -> {
+                showToast(I18n.t("daily.tomorrow"))
+                true
+            }
+            DailyPanel.Result.CLAIMED -> true
+            DailyPanel.Result.NONE -> false
+        }
+    }
 
     override fun interceptBack(): Boolean = apple.handleBack()
 
@@ -63,6 +77,9 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
 
         val hovered = hoveredButton()
         val delta = Gdx.graphics.deltaTime
+        dailyShown = MathUtils.lerp(dailyShown, if (apple.active) 0f else 1f, minOf(1f, delta * 6f))
+        val entrance = easeOutBack(MathUtils.clamp((time - DAILY_START) / DAILY_TIME, 0f, 1f))
+        daily.update(delta, worldWidth, worldHeight, entrance * dailyShown)
         for (slot in slots) {
             val target = if (slot.button === hovered) 1f else 0f
             slot.hover = MathUtils.lerp(slot.hover, target, minOf(1f, delta * HOVER_SPEED))
@@ -115,6 +132,8 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         drawGarland(shapes)
         drawTitleShapes(shapes)
         drawCoinPill(shapes)
+        daily.drawShapes(shapes)
+        daily.drawButtonShape(shapes)
         drawButtonGlow(shapes)
     }
 
@@ -400,6 +419,7 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         val coins = game.data.coins.toString()
         val width = game.textWidth(coins, 2f) + 74f
         game.drawText(coins, worldWidth - 24f - width + 52f, worldHeight - COIN_Y, 2f, Palette.GOLD_LIGHT, centered = false)
+        daily.drawTexts()
     }
 
     private fun easeOutBack(t: Float): Float {
@@ -437,6 +457,8 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         private const val SLEIGH_OFFSET = 13f
         private const val SLEIGH_SCALE = 0.75f
         private const val COIN_Y = 74f
+        private const val DAILY_START = 0.7f
+        private const val DAILY_TIME = 0.55f
         private val BULBS = listOf(
             Color.valueOf("ff4d5e"),
             Color.valueOf("ffd166"),

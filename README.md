@@ -42,6 +42,8 @@ A downhill sled race against three rivals: Comet the reindeer, Jingle the elf an
 
 The main menu is fully animated: the title letters drop in and wave, Santa's hat sits on the "S", a garland of blinking Christmas lights hangs across the top, stars twinkle, Santa's sleigh flies across the sky now and then, the buttons pop in one after another with snow on top and holly on the Game Mode button, and on desktop the buttons grow and glow when you hover over them.
 
+On the right of the main menu is the **Daily Gifts** calendar: 15 days, each with a new gift. Tap the glowing gift or Claim once a day to get golden gifts (20 on day 1, growing every day, with big golden gifts on days 5, 10 and 15 and 250 on the last day). Claimed days show an opened box with a check, and after claiming a countdown shows when the next gift is ready. After day 15 the calendar starts over. Daily progress is kept in the autosave and is not changed by loading a slot.
+
 - **Game Mode** — pick Catch Gifts, Stolen Gifts, Escape from the Santa City or Sled Race
 - **Awards** — a chalet trophy room. The awards hang on a candy-cane board on the right with a progress bar, unlocked ones first. On the left, four competing green elves (Twig, Holly, Biscuit and Sprout) sit at a long table with hot cocoa, cookies and a golden trophy, chatting and laughing with each other. Tap an elf and it tells you a joke or a funny story, and the others crack up
 - **Shop** — a cozy Christmas chalet where Pip the elf sells skins, cosmetics and perks for golden gifts
@@ -108,7 +110,7 @@ There are 24 awards: five for each of the first three game modes, four for Sled 
 
 The game uses its own binary save format instead of platform preferences. Every file starts with a signature, a format version and a type, followed by the payload and a CRC32 checksum, and is written to a temporary file first and then swapped in, so an interrupted write never leaves a broken save behind. Damaged files are detected and ignored.
 
-- `saves/autosave.sav` — best scores, stats, awards, golden gifts, Shop items and the current Stolen Gifts run, updated automatically
+- `saves/autosave.sav` — best scores, stats, awards, golden gifts, Shop items, daily gifts and the current Stolen Gifts run, updated automatically
 - `saves/slot1.sav` to `saves/slot3.sav` — manual save slots from Options
 - `saves/settings.sav` — options such as the FPS limit, language, music volume, haptics and key bindings, kept separate so loading a slot never changes them
 
@@ -150,6 +152,10 @@ GitHub Actions builds the APK and the desktop jar together in one Gradle run on 
 - `Santa-Linux` — `Santa-Linux.tar.gz` with a ready-to-run `SantaGame` folder and a bundled Java runtime
 - `Santa-macOS-AppleSilicon` and `Santa-macOS-Intel` — `SantaGame.app` zipped, for M-series and Intel Macs
 - `Santa-iOS` — an unsigned `Santa-iOS.ipa`, ready to sign and sideload (AltStore, Sideloadly, TrollStore and similar)
+
+### Releases
+
+The **Release** workflow (`.github/workflows/release.yml`) runs the same builds, but only when started by hand from the Actions tab. It asks for a version (for example `0.1.0`), checks that `documents/release/v<version>.md` exists, builds every platform and publishes a GitHub Release tagged `v<version>` with those notes and all the files: `Santa-Android.apk`, `Santa-iOS.ipa`, `Santa-Windows.zip`, `Santa-macOS-AppleSilicon.zip`, `Santa-macOS-Intel.zip` and `Santa-Linux.tar.gz`. Release notes live in `documents/release`.
 
 ### Running on macOS
 

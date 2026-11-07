@@ -1,0 +1,282 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (needs documents/release/v<version>.md)
+        required: true
+        default: 0.1.0
+      prerelease:
+        description: Mark as pre-release
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Android + Desktop jar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check release notes
+        run: test -f "documents/release/v${{ inputs.version }}.md"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: |
+          chmod +x gradlew
+          ./gradlew :android:assembleDebug :lwjgl3:dist --parallel --build-cache
+          mv android/build/outputs/apk/debug/*.apk Santa-Android.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-Android
+          path: Santa-Android.apk
+          if-no-files-found: error
+
+      - name: Package Linux app
+        run: |
+          mkdir -p linux-input
+          cp lwjgl3/build/dist/SantaGame.jar linux-input/
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version ${{ inputs.version }} \
+            --vendor GreenCoolerApple \
+            --input linux-input \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.png \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
+            --java-options "-Dfile.encoding=UTF-8" \
+            --dest linux-package
+          cp lwjgl3/linux/SantaGame.desktop lwjgl3/linux/install.sh linux-package/SantaGame/
+          chmod +x linux-package/SantaGame/install.sh
+          tar -czf Santa-Linux.tar.gz -C linux-package SantaGame
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-Linux
+          path: Santa-Linux.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Upload desktop jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-jar
+          path: lwjgl3/build/dist/SantaGame.jar
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+  windows:
+    name: Windows
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout icon
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: lwjgl3/icons
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download desktop jar
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-jar
+          path: dist
+
+      - name: Package app
+        shell: bash
+        run: |
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version ${{ inputs.version }} \
+            --vendor GreenCoolerApple \
+            --input dist \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.ico \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
+            --java-options "-Dfile.encoding=UTF-8" \
+            --dest package
+
+      - name: Zip app
+        shell: pwsh
+        run: Compress-Archive -Path package/SantaGame -DestinationPath Santa-Windows.zip
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-Windows
+          path: Santa-Windows.zip
+          compression-level: 0
+          if-no-files-found: error
+
+  macos:
+    name: macOS (${{ matrix.name }})
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Apple Silicon
+            runner: macos-latest
+            artifact: Santa-macOS-AppleSilicon
+          - name: Intel
+            runner: macos-15-intel
+            artifact: Santa-macOS-Intel
+
+    steps:
+      - name: Checkout icon
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: lwjgl3/icons
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download desktop jar
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-jar
+          path: dist
+
+      - name: Package app
+        run: |
+          "$JAVA_HOME/bin/jpackage" \
+            --type app-image \
+            --name SantaGame \
+            --app-version 1.0.0 \
+            --vendor GreenCoolerApple \
+            --input dist \
+            --main-jar SantaGame.jar \
+            --icon lwjgl3/icons/icon.icns \
+            --mac-package-identifier com.greencoolerapple.santagame \
+            --mac-package-name "Santa Game" \
+            --add-modules java.base,java.desktop,java.logging,jdk.unsupported \
+            --jlink-options "--strip-debug --no-header-files --no-man-pages --compress=2" \
+            --java-options "-XstartOnFirstThread -Dfile.encoding=UTF-8" \
+            --dest package
+          codesign --force --deep --sign - package/SantaGame.app
+          ditto -c -k --keepParent package/SantaGame.app ${{ matrix.artifact }}.zip
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+          compression-level: 0
+          if-no-files-found: error
+
+  ios:
+    name: iOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build IPA
+        run: |
+          chmod +x gradlew
+          ./gradlew :ios:createIPA -Probovm.iosSkipSigning=true -Probovm.archs=arm64 --stacktrace
+          IPA=$(find ios/build -name "*.ipa" | head -n 1)
+          test -n "$IPA"
+          cp "$IPA" Santa-iOS.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Santa-iOS
+          path: Santa-iOS.ipa
+          compression-level: 0
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: [build, windows, macos, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout notes
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: documents/release
+          sparse-checkout-cone-mode: false
+
+      - name: Download builds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Santa-*
+          path: release
+          merge-multiple: true
+
+      - name: List files
+        run: ls -la release
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Santa Game v${{ inputs.version }}
+          body_path: documents/release/v${{ inputs.version }}.md
+          prerelease: ${{ inputs.prerelease }}
+          target_commitish: ${{ github.sha }}
+          files: release/*
+          fail_on_unmatched_files: true
+
+  cleanup:
+    name: Cleanup
+    needs: [windows, macos]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove temporary jar artifact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: desktop-jar
+          failOnError: false

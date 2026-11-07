@@ -31,6 +31,8 @@ class GameData {
     var sledWins = 0
     var sledGifts = 0
     var sledPaint = 0
+    var dailyClaimed = 0
+    var dailyLastDay = -1L
 
     val hasRun: Boolean
         get() = runHouse > 0
@@ -99,6 +101,8 @@ class GameData {
             out.writeInt(sledWins)
             out.writeInt(sledGifts)
             out.writeInt(sledPaint)
+            out.writeInt(dailyClaimed)
+            out.writeLong(dailyLastDay)
         }
         return bytes.toByteArray()
     }
@@ -142,6 +146,10 @@ class GameData {
             }
             if (input.available() >= 4) {
                 sledPaint = input.readInt().coerceAtLeast(0)
+            }
+            if (input.available() >= 12) {
+                dailyClaimed = input.readInt().coerceAtLeast(0)
+                dailyLastDay = input.readLong()
             }
         }
     }

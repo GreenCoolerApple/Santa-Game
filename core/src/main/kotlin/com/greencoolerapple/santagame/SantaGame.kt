@@ -36,6 +36,7 @@ import com.greencoolerapple.santagame.screens.PlayScreen
 import com.greencoolerapple.santagame.screens.ShopScreen
 import com.greencoolerapple.santagame.screens.SledRaceScreen
 import com.greencoolerapple.santagame.screens.StolenGiftsScreen
+import com.greencoolerapple.santagame.rewards.DailyRewards
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.shop.ShopItem
 import com.greencoolerapple.santagame.world.Scenery
@@ -210,6 +211,12 @@ class SantaGame : Game() {
         settings.cycleIntensity(step)
         saves.saveSettings(settings)
         haptics.play(Haptics.Pattern.PREVIEW)
+    }
+
+    fun claimDailyReward(): Int {
+        val amount = DailyRewards.claim(data)
+        if (amount > 0) earnCoins(amount)
+        return amount
     }
 
     fun earnCoins(amount: Int) {
