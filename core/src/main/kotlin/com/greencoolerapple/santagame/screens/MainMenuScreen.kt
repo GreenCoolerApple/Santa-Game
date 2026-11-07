@@ -13,6 +13,7 @@ import com.greencoolerapple.santagame.i18n.I18n
 import com.greencoolerapple.santagame.shop.Cosmetics
 import com.greencoolerapple.santagame.ui.Button
 import com.greencoolerapple.santagame.ui.DailyPanel
+import com.greencoolerapple.santagame.ui.MenuVillage
 import com.greencoolerapple.santagame.ui.Draw
 
 class MainMenuScreen(game: SantaGame) : MenuBase(game) {
@@ -39,6 +40,7 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
 
     private val apple = GreenApple(game)
     private val daily = DailyPanel(game)
+    private val village = MenuVillage(game)
     private var dailyShown = 1f
     private val mouse = Vector2()
     private val tint = Color()
@@ -80,6 +82,7 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
         dailyShown = MathUtils.lerp(dailyShown, if (apple.active) 0f else 1f, minOf(1f, delta * 6f))
         val entrance = easeOutBack(MathUtils.clamp((time - DAILY_START) / DAILY_TIME, 0f, 1f))
         daily.update(delta, worldWidth, worldHeight, entrance * dailyShown)
+        village.update(delta, worldWidth)
         for (slot in slots) {
             val target = if (slot.button === hovered) 1f else 0f
             slot.hover = MathUtils.lerp(slot.hover, target, minOf(1f, delta * HOVER_SPEED))
@@ -127,6 +130,8 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
     }
 
     override fun drawContentShapes(shapes: ShapeRenderer) {
+        village.drawChalets(shapes, worldWidth)
+        village.drawElves(shapes)
         drawStars(shapes)
         drawSleigh(shapes)
         drawGarland(shapes)
@@ -142,10 +147,12 @@ class MainMenuScreen(game: SantaGame) : MenuBase(game) {
             if (appear(slot.order) > 0.6f) drawSnowCap(shapes, slot.button)
         }
         drawHolly(shapes, gameModeButton)
+        village.drawBubble(shapes)
         apple.drawShapes(shapes)
     }
 
     override fun drawOverlayTexts() {
+        village.drawTexts()
         apple.drawTexts()
     }
 

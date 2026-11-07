@@ -40,7 +40,7 @@ A downhill sled race against three rivals: Comet the reindeer, Jingle the elf an
 
 ## Menus
 
-The main menu is fully animated: the title letters drop in and wave, Santa's hat sits on the "S", a garland of blinking Christmas lights hangs across the top, stars twinkle, Santa's sleigh flies across the sky now and then, the buttons pop in one after another with snow on top and holly on the Game Mode button, and on desktop the buttons grow and glow when you hover over them.
+The main menu is fully animated: the title letters drop in and wave, Santa's hat sits on the "S", a garland of blinking Christmas lights hangs across the top, stars twinkle, Santa's sleigh flies across the sky now and then, the buttons pop in one after another with snow on top and holly on the Game Mode button, and on desktop the buttons grow and glow when you hover over them. Down on the snow there are two little chalets with warm windows, smoking chimneys and string lights, and five elves walk around the village. Every few seconds two of them meet up, face each other and have a short chat in speech bubbles before going back to their stroll.
 
 On the right of the main menu is the **Daily Gifts** calendar: 15 days, each with a new gift. Tap the glowing gift or Claim once a day to get golden gifts (20 on day 1, growing every day, with big golden gifts on days 5, 10 and 15 and 250 on the last day). Claimed days show an opened box with a check, and after claiming a countdown shows when the next gift is ready. After day 15 the calendar starts over. Daily progress is kept in the autosave and is not changed by loading a slot.
 
@@ -48,7 +48,7 @@ On the right of the main menu is the **Daily Gifts** calendar: 15 days, each wit
 - **Awards** — a chalet trophy room. The awards hang on a candy-cane board on the right with a progress bar, unlocked ones first. On the left, four competing green elves (Twig, Holly, Biscuit and Sprout) sit at a long table with hot cocoa, cookies and a golden trophy, chatting and laughing with each other. Tap an elf and it tells you a joke or a funny story, and the others crack up
 - **Shop** — a cozy Christmas chalet where Pip the elf sells skins, cosmetics and perks for golden gifts
 - **Skins** — a chalet dressing room. Your character stands on a rug in front of a big golden mirror on the left; switch between Santa and the Boy with the buttons below (or left/right on a keyboard). On the right are the skins for that character: tap one you own to wear it and the character pops with sparkles, locked ones show their price, and the last card takes you to the Shop
-- **Options** — FPS limit (30, 60, 90, 120 or Max), language (English, Português (Brasil) or Español), music volume, Save Game and Load Game. On Android and iOS it also has haptics on/off and haptics intensity (25% to 100%); these are hidden on desktop, which has no vibration
+- **Options** — a chalet workshop. On the left, five elves are building a little log chalet all by themselves: one carries planks from the pile to the site, one hammers away with sparks and sawdust, one saws at the sawhorse, and two walk around giving orders and chatting. Every plank they bring adds a log to the wall, and when it is finished the roof, door and windows light up, everyone jumps and they start a new one. Tap an elf to hear what it has to say. On the right, on a candy-cane board, are the settings: FPS limit (30, 60, 90, 120 or Max), language (English, Português (Brasil) or Español), music volume, Save Game and Load Game. On Android and iOS it also has haptics on/off and haptics intensity (25% to 100%); these are hidden on desktop, which has no vibration
 
 The game opens with a short intro (Santa's sleigh crossing the moon) that can be skipped with a tap.
 
@@ -78,6 +78,7 @@ Every part of the game has its own original music, composed and synthesized for 
 - `stolen` — "Tiptoe Thief", a sneaky pizzicato piece in D minor for Stolen Gifts
 - `escape` — "Snowstorm Chase", a tense 150 BPM chase in E minor with drums for Escape from the Santa City
 - `sled` — "Downhill Rush", a fast 168 BPM race theme in D major with driving drums, sleigh bells and a bright lead for Sled Race
+- `options` — "Elf Workshop", a bouncy 132 BPM polka in G major with xylophone, an oom-pah bass, woodblocks and anvil hits for the Options, Controls and save screens
 - `shop` — "Cozy Workshop", a swinging 104 BPM Christmas jazz tune in F major with a walking bass, brushes, electric piano, celesta and soft sleigh bells for the Shop
 
 All looping tracks loop seamlessly. The menu music keeps playing while you move between menu screens and crossfades into each mode's music when a game starts. The tracks are stored as OGG in `assets/music` and as M4A in `assets-ios/music`, because iOS does not play OGG. The volume (Off, 25% to 100%) is in Options.

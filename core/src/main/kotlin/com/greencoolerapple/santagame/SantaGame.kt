@@ -29,10 +29,13 @@ import com.greencoolerapple.santagame.save.GameData
 import com.greencoolerapple.santagame.save.SaveSystem
 import com.greencoolerapple.santagame.save.Settings
 import com.greencoolerapple.santagame.screens.CatchGiftsScreen
+import com.greencoolerapple.santagame.screens.ControlsScreen
 import com.greencoolerapple.santagame.screens.EscapeCityScreen
 import com.greencoolerapple.santagame.screens.IntroScreen
 import com.greencoolerapple.santagame.screens.MenuBase
+import com.greencoolerapple.santagame.screens.OptionsScreen
 import com.greencoolerapple.santagame.screens.PlayScreen
+import com.greencoolerapple.santagame.screens.SaveSlotsScreen
 import com.greencoolerapple.santagame.screens.ShopScreen
 import com.greencoolerapple.santagame.screens.SledRaceScreen
 import com.greencoolerapple.santagame.screens.StolenGiftsScreen
@@ -186,6 +189,7 @@ class SantaGame : Game() {
         when (screen) {
             is IntroScreen -> music.play(MusicPlayer.Track.INTRO, 0f)
             is ShopScreen -> music.play(MusicPlayer.Track.SHOP)
+            is OptionsScreen, is ControlsScreen, is SaveSlotsScreen -> music.play(MusicPlayer.Track.OPTIONS)
             is MenuBase -> music.play(MusicPlayer.Track.MENU)
             is CatchGiftsScreen -> music.play(MusicPlayer.Track.CATCH_GIFTS)
             is StolenGiftsScreen -> music.play(MusicPlayer.Track.STOLEN_GIFTS)
